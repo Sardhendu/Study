@@ -39,8 +39,8 @@ print model.covFunc                     # default prior covariance
 print model.infFunc                     # inference method
 model.getPrior(no_of_samples=100)
 model.plot_samples(model.x_prior,model.prior_fnc,s=100)
-# model.getPosterior(x, y)
-# model.predict(xstar)
-# data = [(x1,y1,max(v1,0.0)) for x1,y1,v1 in zip(xstar, model.ystar, model.ystar_var)]
-# print data
-# model.plot(x, y, xstar)		
+model.getPosterior(x, y)
+model.predict(xstar)
+data = [(x1,y1,max(v1,0.0)) for x1,y1,v1 in zip(xstar, model.ystar, model.ystar_var)]
+print data
+model.plot(x, y, xstar)		
