@@ -53,8 +53,8 @@ class Decompose(Inference):
 		return L
 
 
-	def jitcholesky(self, K):
-		K = np.asfortranarray(K)
+	# def jitcholesky(self, K):
+	# 	K = np.asfortranarray(K)
 
 
 
@@ -70,31 +70,3 @@ class GetSamples(Inference):
 		f_prior = np.dot(L, (np.random.normal(size = (n,s))))
 
 		return f_prior
-
-
-
-
-
-
-# def jitchol(A,maxtries=5):
-#     A = np.asfortranarray(A)
-#     print  'tools: The new revised Covariance matrix A is: ', A 
-#     L, info = lapack.dpotrf(A, lower=1)
-#     print 'tools: L and info is: ', L, info
-#     if info == 0:
-#         return L
-#     else:
-#         diagA = np.diag(A)
-#         print 'tools: The Diagonal Matrix of A is: ', diagA
-#         if np.any(diagA <= 0.):
-#             raise np.linalg.LinAlgError("kernel matrix not positive definite: non-positive diagonal elements")
-#         jitter = diagA.mean() * 1e-9
-#         while maxtries > 0 and np.isfinite(jitter):
-#             print('Warning: adding jitter of {:.10e} to diagnol of kernel matrix for numerical stability'.format(jitter))
-#             try:
-#                 return np.linalg.cholesky(A + np.eye(A.shape[0]).T * jitter, lower=True)
-#             except:
-#                 jitter *= 10
-#             finally:
-#                 maxtries -= 1
-#         raise np.linalg.LinAlgError("kernel matrix not positive definite, even with jitter.")
