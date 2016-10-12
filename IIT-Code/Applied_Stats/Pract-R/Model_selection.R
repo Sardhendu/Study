@@ -1,36 +1,33 @@
-#det_dat <- read.table("../sam/All-Program/App-DataSet/R-Code/Chapter 4/ASCII comma/t4-6 fresh detergent 2.txt", header=T, sep=",")
 
-det_dat_2<- read.table("../sam/All-Program/App-DataSet/R-Code/Chapter 4/ASCII comma/t4-5 gas additive.txt", header = T, sep=",")
+# Load the data
+dat = read.table("../sam/All-Program/App-DataSet/R-Code/Chapter 4/ASCII comma/t4-9 store location complete.txt", header=T, sep=',')
 
-# Get the summary as usual, helps you understand the limits and range of the dataset.
-summary(det_dat_2)
+# Add the Categorical term
+dat$loca<-c(rep('street',5),rep('mall',5),rep('downtown',5))
 
-# plot all the data to see how correlated the data points are:
-plot(det_dat_2)
-# The plot looks like a quadratic, but here the data is 2D so it is easy to vizualize, however for a higher dimensional dataset, we plot the residues and see if there is a quadratic patters.
+# Inorder to make it representable we add a location feature.
+dat$loca<-as.factor(dat$loca)
 
-# First we fit the model
-names(det_dat_2)
-fit<-lm(Mileage~Units, data=det_dat_2)
-plot(fit)
+
+# Now let us see how different models do using the partial F Test:
+
+# For complete model using Dummy Variables
+fit <- lm(formula=y~x+DM+DD, data=dat)
 summary(fit)
-# After we observe this plot we can say that the redidue is a quadratic function, which means there is some quadratic variance not captured by our model. SO we add a Quadratic term to out model.
+# The above model is not very good as the t-statistics for the dummy variable shows a value of 0.178 making the vaiable insignificant.
 
-# Fitting the model with quadratic term:
-fit_q<-lm(Mileage~Units+I(Units^2), data=det_dat_2)
-plot(fit_q)
-summary(fit_q)
-# Now if we see the residue plot, we see that the erros are most likely equally spaces arrouund the mea, which means that we have a good model. Moreever, the p-values are 0 which further bolsters the fact tht the model is good
+# Fitting a different model without th DD term
+fit2 <- lm(formula=y~x+DM, data=dat)
+summary(fit2)
+# In this case all the independent variable seems significant, however the intercept term has a t-statistic of 0.0597. This is okay.
 
-# Now we make some Prediction using the fitted model:
-testx<-seq(from=0,to=5,length=300)
-test.det_dat <- data.frame(Units=testx)
-length(testx)
-pred<-predict(fit_q,newdata=test.det_dat)
-length(pred)
-
-#plot(dat$x,dat$y,type='point',xlab='x',ylab='y')
-plot(det_dat_2$Units,det_dat_2$Mileage, type='point', xlab='Units', ylab="Mileage")
-lines(test.det_dat$Units, pred, lty='dashed', col='red')
+# Fitting the model wothout the dumy variables
+fit3 <- lm(formula=y~x, data=dat)
+summary(fit3)
 
 
+
+# NOW Testing the statistics and comparing models using ANOVA outcomes.
+anova(fit,fit2)
+anova(fit,fit3)
+anova(fit2,fit3)
