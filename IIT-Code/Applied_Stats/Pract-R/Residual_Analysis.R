@@ -23,7 +23,7 @@ summary(fit_q)
 # Now if we see the residue plot, we see that the erros are most likely equally spaces arrouund the mea, which means that we have a good model. Moreever, the p-values are 0 which further bolsters the fact tht the model is good
 
 # Now we make some Prediction using the fitted model:
-testx<-seq(from=0,to=5,length=300)
+testx<-seq(from=0,to=5,length=300)   # Equivallent of linspace in python
 test.det_dat <- data.frame(Units=testx)
 length(testx)
 pred<-predict(fit_q,newdata=test.det_dat)

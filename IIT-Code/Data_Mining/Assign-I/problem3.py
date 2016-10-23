@@ -70,37 +70,6 @@ def plot1(X, Y, legend_label=None, xlabel=None, ylabel=None):
 print(pca.explained_variance_ratio_)
 plot1(principal_component1, principal_component2, legend_label=labels_unq, xlabel='Principal Component 1', ylabel='Principal Component 2')
 
-##################################################################################################################################################
-
-# def plot2(X, Y, legend_label=None, xlabel=None, ylabel=None):
-# 	import matplotlib
-# 	# matplotlib.use('TkAgg')    # Since the matplotlib backend doesn't know we have to manually implement it 
-# 	from matplotlib import pyplot as plt
-# 	import seaborn as sns
-
-# 	color_list = sns.color_palette("Set1", 10)
-# 	plt.ion()
-# 	with plt.style.context('seaborn-whitegrid'):
-# 	    plt.figure(figsize=(6, 4))
-# 	    color_list = color_list[0:len(legend_label)]
-# 	    for label, color in zip(legend_label,color_list):
-# 	        plt.scatter(X[labels==label],
-# 	                    Y[labels==label],
-# 	                    label=label,
-# 	                    c=color)
-# 	    if xlabel and ylabel:
-# 		    plt.xlabel('Principal Component 1')
-# 		    plt.ylabel('Principal Component 2')
-# 	    plt.legend(loc='upper right')
-# 	    plt.tight_layout()
-# 	    plt.show('wait')
-
-# plot1(principal_component1, principal_component2, legend_label=['iris-versicolor', 'iris-virginica'], xlabel='Principal Component 1', ylabel='Principal Component 2')
-
-
-# def plot2():
-
-
 
 
 ##################################################################################################################################################
@@ -139,3 +108,34 @@ def plot_distribution_for_attributes():
 
 
 # plot_distribution_for_attributes()
+
+
+##################################################################################################################################################
+
+# def plot2(X, Y, legend_label=None, xlabel=None, ylabel=None):
+# 	import matplotlib
+# 	# matplotlib.use('TkAgg')    # Since the matplotlib backend doesn't know we have to manually implement it 
+# 	from matplotlib import pyplot as plt
+# 	import seaborn as sns
+
+# 	color_list = sns.color_palette("Set1", 10)
+# 	plt.ion()
+# 	with plt.style.context('seaborn-whitegrid'):
+# 	    plt.figure(figsize=(6, 4))
+# 	    color_list = color_list[0:len(legend_label)]
+# 	    for label, color in zip(legend_label,color_list):
+# 	        plt.scatter(X[labels==label],
+# 	                    Y[labels==label],
+# 	                    label=label,
+# 	                    c=color)
+# 	    if xlabel and ylabel:
+# 		    plt.xlabel('Principal Component 1')
+# 		    plt.ylabel('Principal Component 2')
+# 	    plt.legend(loc='upper right')
+# 	    plt.tight_layout()
+# 	    plt.show('wait')
+
+# plot1(principal_component1, principal_component2, legend_label=['iris-versicolor', 'iris-virginica'], xlabel='Principal Component 1', ylabel='Principal Component 2')
+
+
+# def plot2():
