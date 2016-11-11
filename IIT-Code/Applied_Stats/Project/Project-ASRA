@@ -1,3 +1,0 @@
-inport csv
-
-datam = read.csv2("/Users/sam/All-Program/App-DataSet/Study/LoanStats3a.csv", header=TRUE, sep=",")
