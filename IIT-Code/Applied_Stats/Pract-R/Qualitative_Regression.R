@@ -1,5 +1,5 @@
 # Store location example
-dat<-read.table("../sam/All-Program/App-DataSet/R-Code/Chapter 4/ASCII comma/t4-9 store location complete.txt",header=T,sep=',')
+dat<-read.table("../sam/All-Program/App-DataSet/Study/IIT-Code/Applied_Stats/Chapter 4/ASCII comma/t4-9 store location complete.txt",header=T,sep=',')
 
 # The data loaded has two Dummy variable DM and DD, where DM=1 when the transaction belongs
 # to the store at Mall, DD=1 when the transaction belongs to the downtown store
@@ -8,7 +8,7 @@ dat<-read.table("../sam/All-Program/App-DataSet/R-Code/Chapter 4/ASCII comma/t4-
 dat$loca<-c(rep('street',5),rep('mall',5),rep('downtown',5))
 
 # We get the sumarry statistics:
-summary(data)
+summary(dat)
 
 # We plot the Data exclusing the last column and the first column:
 plot(dat[1:dim(dat)[2]-1])
@@ -50,3 +50,7 @@ lines(testx,pred[test.dat$loca=='street'],lty='dashed')
 lines(testx,pred[test.dat$loca=='mall'],lty='dashed',col='red')
 lines(testx,pred[test.dat$loca=='downtown'],lty='dashed',col='blue')
 legend('topleft',legend=c('street','mall','downtown'),lty=rep('dashed',3),col=c('black','red','blue'))
+
+
+
+

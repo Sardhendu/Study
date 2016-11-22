@@ -1,6 +1,6 @@
 #det_dat <- read.table("../sam/All-Program/App-DataSet/R-Code/Chapter 4/ASCII comma/t4-6 fresh detergent 2.txt", header=T, sep=",")
 
-det_dat_2<- read.table("../sam/All-Program/App-DataSet/R-Code/Chapter 4/ASCII comma/t4-5 gas additive.txt", header = T, sep=",")
+det_dat_2<- read.table("../sam/All-Program/App-DataSet/Study/IIT-Code/Applied_Stats/Chapter 4/ASCII comma/t4-5 gas additive.txt", header = T, sep=",")
 
 # Get the summary as usual, helps you understand the limits and range of the dataset.
 summary(det_dat_2)
