@@ -40,15 +40,18 @@ sum([(zt-mean_zt)*(zt-mean_zt) for zt in zt_zt1])
 ######### Data Mining
 alpha = 0.01
 beta = 0.5
+
+alpha = 0.0020548
+beta = 0.1875
 # mean = 500+320+640/3 = 1460
 # mean = 
 A = [3.06, 500*alpha, 6*beta]  
 B = [2.68, 320*alpha, 4*beta]
 C = [2.92, 640*alpha, 6*beta]
 
-N = np.dot(B,C)
-D = pow(sum([pow(i,2) for i in B]), 0.5) * pow(sum([pow(i,2) for i in C]), 0.5)
-
+np.dot(A,B)/(pow(sum([pow(i,2) for i in A]), 0.5) * pow(sum([pow(i,2) for i in B]), 0.5))
+np.dot(A,C)/(pow(sum([pow(i,2) for i in A]), 0.5) * pow(sum([pow(i,2) for i in C]), 0.5))
+np.dot(B,C)/(pow(sum([pow(i,2) for i in B]), 0.5) * pow(sum([pow(i,2) for i in C]), 0.5))
 
 A = [0.67,1.67,0,1.67,-2.33,0,-0.33,-1.33]
 B = [0,0.67,1.67,0.67,-1.33,-0.33,-1.33,0]
