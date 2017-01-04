@@ -10,10 +10,11 @@ function a3(wd_coefficient, n_hid, n_iters, learning_rate,momentum_multiplier, d
   datas = from_data_file.data;
   n_training_cases = size(datas.training.inputs, 2);  % 1000-> number of training cases
   % datas.training.inputs = 256 x 1000 (thousand dataset and each training case for 256 dimension each)
-  disp('done with all shitty initialization and stuff');
+  disp('Done with all shitty initialization and stuff');
   
   if n_iters ~= 0
       test_gradient(model, datas.training, wd_coefficient); 
+      disp('Done testing the gradient')
   end
 
   % optimization
@@ -26,8 +27,10 @@ function a3(wd_coefficient, n_hid, n_iters, learning_rate,momentum_multiplier, d
     best_so_far.validation_loss = inf;
     best_so_far.after_n_iters = -1;
   end
-  disp('done with first optimization initilization and stuff');
+  disp('Done with first optimization initilization and stuff');
   
+  % The below code performs optimization and descents for the given
+  % iteration
   for optimization_iteration_i = 1:n_iters,
     disp('aaaa Iteration number is:'), disp (otimization_iteration_i)
     model = theta_to_model(theta);
@@ -51,7 +54,7 @@ function a3(wd_coefficient, n_hid, n_iters, learning_rate,momentum_multiplier, d
       fprintf('After %d optimization iterations, training data loss is %f, and validation data loss is %f\n', optimization_iteration_i, training_data_losses(end), validation_data_losses(end));
     end
   end
-  disp('done with iteration dude, if at all there was any');
+  disp('Done with iteration dude, if at all there was any');
   
   if n_iters ~= 0, test_gradient(model, datas.training, wd_coefficient); end % check again, this time with more typical parameters
   if do_early_stopping,
@@ -59,7 +62,7 @@ function a3(wd_coefficient, n_hid, n_iters, learning_rate,momentum_multiplier, d
     theta = best_so_far.theta;
   end
   
-  disp('done with the optomization, now we do some reporting.')
+  disp('Done with the optomization, now we do some reporting.')
   % the optimization is finished. Now do some reporting.
   model = theta_to_model(theta);
   if n_iters ~= 0,
@@ -75,6 +78,8 @@ function a3(wd_coefficient, n_hid, n_iters, learning_rate,momentum_multiplier, d
   end
   datas2 = {datas.training, datas.validation, datas.test};
   data_names = {'training', 'validation', 'test'};
+  
+  % Calculting Loss
   for data_i = 1:3,
     data = datas2{data_i};
     data_name = data_names{data_i};
@@ -122,9 +127,12 @@ end
 function ret = log_sum_exp_over_rows(a)
     disp('Inside the ret-log_sum_exp_over_rows function')
   % This computes log(sum(exp(a), 1)) in a numerically stable way
-  maxs_small = max(a, [], 1);
-  maxs_big = repmat(maxs_small, [size(a, 1), 1]);
+  maxs_small = max(a, [], 1); 
+  % Finds the maximum value of each column of the matrix
+  maxs_big = repmat(maxs_small, [size(a, 1), 1]); 
+  % Create a matrix of same size as that of a but with the biggest columnar element of matrix a 
   ret = log(sum(exp(a - maxs_big), 1)) + maxs_small;
+  % The above formula is similar to doing the denominator of softmax but marginalize by the use of log. : 
 end
 
 function ret = loss(model, data, wd_coefficient)
@@ -132,7 +140,8 @@ function ret = loss(model, data, wd_coefficient)
   % model.input_to_hid is a matrix of size <number of hidden units> by <number of inputs i.e. 256>. It contains the weights from the input units to the hidden units.
   % model.hid_to_class is a matrix of size <number of classes i.e. 10> by <number of hidden units>. It contains the weights from the hidden units to the softmax units.
   % data.inputs is a matrix of size <number of inputs i.e. 256> by <number of data cases>. Each column describes a different data case. 
-  % data.targets is a matrix of size <number of classes i.e. 10> by <number of data cases>. Each column describes a different data case. It contains a one-of-N encoding of the class, i.e. one element in every column is 1 and the others are 0.
+  % data.targets is a matrix of size <number of classes i.e. 10> by <number of data cases>. Each column describes a different data case. It contains a one-of-N encoding of the class, 
+  % i.e. one element in every column is 1 and the others are 0.
 	 
   % Before we can calculate the loss, we need to calculate a variety of intermediate values, like the state of the hidden units.
   hid_input = model.input_to_hid * data.inputs; % input to the hidden units, i.e. before the logistic. size: <number of hidden units> by <number of data cases>
