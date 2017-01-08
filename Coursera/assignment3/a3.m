@@ -1,4 +1,4 @@
-function a3(wd_coefficient, n_hid, n_iters, learning_rate,momentum_multiplier, do_early_stopping, mini_batch_size)
+function a3(wd_coefficient, n_hid, n_iters,learning_rate,momentum_multiplier, do_early_stopping, mini_batch_size)
   warning('error', 'Octave:broadcast');
   disp('Inside the a3 function')
   if exist('page_output_immediately'), page_output_immediately(1); end
@@ -77,34 +77,34 @@ function a3(wd_coefficient, n_hid, n_iters, learning_rate,momentum_multiplier, d
     fprintf('Early stopping: validation loss was lowest after %d iterations. We chose the model that we had then.\n', best_so_far.after_n_iters);
     theta = best_so_far.theta;
   end
-%   
-%   disp('Done with the optomization, now we do some reporting.')
-%   % the optimization is finished. Now do some reporting.
-%   model = theta_to_model(theta);
-%   if n_iters ~= 0,
-%     disp ('their are some iteration....')
-%     clf;
-%     hold on;
-%     plot(training_data_losses, 'b');
-%     plot(validation_data_losses, 'r');
-%     legend('training', 'validation');
-%     ylabel('loss');
-%     xlabel('iteration number');     
-%     hold off;
-%   end
-%   datas2 = {datas.training, datas.validation, datas.test};
-%   data_names = {'training', 'validation', 'test'};
-%   
-%   % Calculting Loss
-%   for data_i = 1:3,
-%     data = datas2{data_i};
-%     data_name = data_names{data_i};
-%     fprintf('\nThe loss on the %s data is %f\n', data_name, loss(model, data, wd_coefficient));
-%     if wd_coefficient~=0,
-%       fprintf('The classification loss (i.e. without weight decay) on the %s data is %f\n', data_name, loss(model, data, 0));
-%     end
-%     fprintf('The classification error rate on the %s data is %f\n', data_name, classification_performance(model, data));
-%   end
+  
+  disp('Done with the optomization, now we do some reporting.')
+  % the optimization is finished. Now do some reporting.
+  model = theta_to_model(theta);
+  if n_iters ~= 0,
+    disp ('their are some iteration....')
+    clf;
+    hold on;
+    plot(training_data_losses, 'b');
+    plot(validation_data_losses, 'r');
+    legend('training', 'validation');
+    ylabel('loss');
+    xlabel('iteration number');     
+    hold off;
+  end
+  datas2 = {datas.training, datas.validation, datas.test};
+  data_names = {'training', 'validation', 'test'};
+  
+  % Calculting Loss
+  for data_i = 1:3,
+    data = datas2{data_i};
+    data_name = data_names{data_i};
+    fprintf('\nThe loss on the %s data is %f\n', data_name, loss(model, data, wd_coefficient));
+    if wd_coefficient~=0,
+      fprintf('The classification loss (i.e. without weight decay) on the %s data is %f\n', data_name, loss(model, data, 0));
+    end
+    fprintf('The classification error rate on the %s data is %f\n', data_name, classification_performance(model, data));
+  end
 end
 
 function test_gradient(model, data, wd_coefficient)
@@ -139,7 +139,7 @@ function ret = logistic(input)
 end
 
 function ret = log_sum_exp_over_rows(a)
-    disp('Inside the ret-log_sum_exp_over_rows function')
+%     disp('Inside the ret-log_sum_exp_over_rows function')
   % This computes log(sum(exp(a), 1)) in a numerically stable way
   maxs_small = max(a, [], 1); 
   % Finds the maximum value of each column of the matrix
@@ -149,7 +149,7 @@ function ret = log_sum_exp_over_rows(a)
 end
 
 function ret = loss(model, data, wd_coefficient)
-    disp('Inside the ret-loss function')
+%     disp('Inside the ret-loss function')
   % model.input_to_hid is a matrix of size <number of hidden units> by <number of inputs i.e. 256>. It contains the weights from the input units to the hidden units.
   % model.hid_to_class is a matrix of size <number of classes i.e. 10> by <number of hidden units>. It contains the weights from the hidden units to the softmax units.
   % data.inputs is a matrix of size <number of inputs i.e. 256> by <number of data cases>. Each column describes a different data case. 
@@ -177,7 +177,7 @@ function ret = loss(model, data, wd_coefficient)
   
   % The below is similar appproch to cross entropy but instead of doing sum
   % we do -mean
-  disp('qpqppqpqpqpqpqpqpqpqpqpqpqpp'),disp(size(log_class_prob .* data.targets))
+%   disp('qpqppqpqpqpqpqpqpqpqpqpqpqpp'),disp(size(log_class_prob .* data.targets))
   classification_loss = -mean(sum(log_class_prob .* data.targets, 1)); 
   % select the right log class probability using that sum; then take the mean over all data cases.
   wd_loss = sum(model_to_theta(model).^2)/2*wd_coefficient; 
@@ -234,7 +234,8 @@ function ret = d_loss_by_d_model(model, data, wd_coefficient)
   disp('size(error_deriv) is: '), disp(size(error_deriv)) 
   
   % New hidden_to_output_wghts
-  hid_to_output_wght_gradient = ((1./batch_size) .* (error_deriv * hidden_state')) + (wd_coefficient .* model.hid_to_class) ;
+  disp('qpqppqpqpqpqpqpqpqpqpqpqpqpp  '),disp(wd_coefficient)
+  hid_to_output_wght_gradient = ((1./batch_size) .* (error_deriv * hidden_state')) + (wd_coefficient .*  model.hid_to_class) ;  % wd_coefficient .*
   % (wd_coefficient .* model.hid_to_class)  = gradient of the
   % regularization term
   % (1./batch_size) is done to normalize the matrix as while the cross entropy we
@@ -257,17 +258,17 @@ function ret = d_loss_by_d_model(model, data, wd_coefficient)
 end
 
 function ret = model_to_theta(model)
-  disp('Inside the ret-model_to_theta function')
+%   disp('Inside the ret-model_to_theta function')
   % This function takes a model (or gradient in model form), and turns it into one long vector. See also theta_to_model.
   input_to_hid_transpose = transpose(model.input_to_hid);
   hid_to_class_transpose = transpose(model.hid_to_class);
-  disp('size(input_to_hid_transpose) is: '),disp(size(input_to_hid_transpose))
-  disp ('size(hid_to_class_transpose) is :'),disp(size(hid_to_class_transpose))
+%   disp('size(input_to_hid_transpose) is: '),disp(size(input_to_hid_transpose))
+%   disp ('size(hid_to_class_transpose) is :'),disp(size(hid_to_class_transpose))
   ret = [input_to_hid_transpose(:); hid_to_class_transpose(:)];
 end
 
 function ret = theta_to_model(theta)
-disp('Inside the ret-theta_to_model function')
+% disp('Inside the ret-theta_to_model function')
   % This function takes a model (or gradient) in the form of one long vector 
   % (maybe produced by model_to_theta), and restores it to the structure format, 
   % i.e. with fields .input_to_hid and .hid_to_class, both matrices.
@@ -277,7 +278,7 @@ disp('Inside the ret-theta_to_model function')
 end
 
 function ret = initial_model(n_hid)
-  disp('Inside the ret-initial_model function')
+%   disp('Inside the ret-initial_model function')
   n_params = (256+10) * n_hid;  % num of parameters
   as_row_vector = cos(0:(n_params-1));  % 1 x n_params
   ret = theta_to_model(as_row_vector(:) * 0.1); 
@@ -285,7 +286,7 @@ function ret = initial_model(n_hid)
 end
 
 function ret = classification_performance(model, data)
-disp('Inside the ret-classification_performance function')
+% disp('Inside the ret-classification_performance function')
   % This returns the fraction of data cases that is incorrectly classified by the model.
   hid_input = model.input_to_hid * data.inputs; % input to the hidden units, i.e. before the logistic. size: <number of hidden units> by <number of data cases>
   hid_output = logistic(hid_input); % output of the hidden units, i.e. after the logistic. size: <number of hidden units> by <number of data cases>
