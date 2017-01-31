@@ -7,9 +7,10 @@
 # Question 1: Create a variable named "myName" and assign to have a value of your
 # preferred name. Create a varaible named "myEmail" and assign it to have a value
 # of your email.
-myName <- 'Sardhendu Mishra'
+myName <- 'Sardhendu'
+myName
 myEmail <- 'smishra13@hawk.iit.edu'
-
+myEmail
 
 
 
@@ -49,6 +50,7 @@ divis(80)
 # defined in Question 2, deterine how many integers between 100 and 10000 are
 # divisible by 127. Assign it to the variable below.
 countDivis <- sum(sapply(myVector, FUN=divis))
+countDivis
 # sapply takes a list as an input and performs the operation as suggested in the FUN and return return s the list.
 
 #bb <- c(127,128,129,127*2,127*3)
@@ -80,20 +82,23 @@ names <- c("Kermit Chacko",
 
 # Returning the 9th last name
 ninthLastName <- tail(strsplit(names[9], " ")[[1]], n=1)
+ninthLastName
 # Returning the last 9 names
 LastnineNames <- names[-1:-(length(names)-9)]
+LastnineNames
 
 
 
 
 
 
-# Question 6: Using the vector "names" from Question 5, write code to
-# determine how many last names start with L.
+# Question 6: Using the vector "names" from Question 5, write code to determine how many last names start with L.
 countLastNameStartsWithL <- sum(grepl(" L", names))  
+countLastNameStartsWithL
 # Using regex operation, grepl will capture any string that that has a space before, provided the string must start with a "L". The case would however fail when a name contains 3 words. A much better approach is given below
-countLastNameStartsWithL <- sapply(strsplit(names," "), function(a) tail(a, n=1))
-# The difference is that we use sapply to loop through each element and then apply the function to find the last word in a name.
+countLastNameStartsWithL <- sum(sapply(strsplit(names," "), function(a) grepl("L", tail(a, n=1))))
+countLastNameStartsWithL
+# The difference is that we use sapply to loop through each element and then apply the function to find the last word in a name, then we do a simple Regex Match and finally Sum. 
 
 
 
@@ -105,9 +110,16 @@ countLastNameStartsWithL <- sapply(strsplit(names," "), function(a) tail(a, n=1)
 dict_namemap <- sapply(strsplit(names, " "), function(a) c(a[1], tail(a, n=1))) # extracts all the last name
 nameMap <- dict_namemap[2,]   # Retrieves the list with the last name
 names(nameMap) <- dict_namemap[1,] # Retrieves the list with the first name and maps it to the last name.
+nameMap['Krista']
 # The code just runs sapply once and forms two stacked list of the first name and last name and then maps each first name to the last name.
 
-
+mapping <- list(
+  'A40'='car (new)',
+  'A41'='car (used)',
+  'A42'='furniture/equipment',
+  'A43'='radio/television',
+  'A44'='domestic appliances'
+)
 
 
 
@@ -149,7 +161,7 @@ data[gov_indx, 'workSector'] <- 'government'
 data[self_indx, 'workSector'] <- 'selfEmployed'
 data[prv_indx, 'workSector'] <- 'Private'
 data[which(is.na(data$workSector)), 'workSector'] <- 'Other'
-
+head(data)
 
 
 
@@ -166,10 +178,10 @@ hist(age) # Plotting the histogram
 
 
 
-
 # Question 11: Determine the top 3 occupations with the highest average hours-per-week
 # Hint: One way to do this is to use tapply
 library(sqldf)
 top3_Occup <- sqldf("select occupation, avg(hours_per_week) as h_avg from data group by occupation order by h_avg desc limit 3")['occupation']
+top3_Occup
 # Using SQL like query to find the top 3 occupation that
 
