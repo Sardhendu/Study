@@ -87,6 +87,7 @@ ninthLastName
 LastnineNames <- names[-1:-(length(names)-9)]
 LastnineNames
 
+# names[-1]
 
 
 
@@ -113,7 +114,7 @@ names(nameMap) <- dict_namemap[1,] # Retrieves the list with the first name and 
 nameMap['Krista']
 # The code just runs sapply once and forms two stacked list of the first name and last name and then maps each first name to the last name.
 
-mapping <- list(
+mapping <- c(
   'A40'='car (new)',
   'A41'='car (used)',
   'A42'='furniture/equipment',

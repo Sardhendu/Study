@@ -1,0 +1,42 @@
+package hadoopMRoperations;
+
+
+public class PRAC1 {
+	public static final String a = "Sam,1,2,3,4";
+	
+//	@SuppressWarnings("null")
+	public static void main(String args[]){
+		
+		String[] token_split = a.split(",");
+		int[] fields = new int[4];
+		String name = token_split[0];
+		
+		System.out.print(name);
+		
+		int i = 0;
+		for (String tkn: token_split){
+			if (i!=0){
+				System.out.println("popopppopopopopoopopopoppopopopop");
+				int field_value = Integer.parseInt(tkn);
+				System.out.println(field_value);
+				fields[i-1] = field_value;
+				System.out.println(fields[i-1]);
+			}
+			i+=1;
+		}
+		System.out.println(fields);
+//		for 
+//		for (String token: ){
+//			System.out.println(token);
+//			System.out.println(i);
+//			if (i==0){
+//				String name
+//			}
+//			else
+//			i+=1;
+//		}
+//		
+	}
+	
+
+}
