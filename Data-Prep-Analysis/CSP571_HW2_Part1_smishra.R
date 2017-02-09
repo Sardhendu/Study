@@ -1,4 +1,4 @@
-# rm(list = ls())
+rm(list = ls())
 
 # Please note that Homework Two consists of two parts, an R file and a
 # Text document. Ensure that you submit both parts.
@@ -22,11 +22,12 @@ plot(BostonHousing)
 cols <- sapply(BostonHousing, is.numeric)
 numeric_cols <- names(which(cols==TRUE))        # Fetch all the numeric colums
 
-# Create a subplot frame for plotting all the box plots using a loop
+# Create a subplot frame for plotting all the box plots using a loop,
+# The method two suggest a horizontal box plot
 plot.new()
 par(mfrow=c(5,3))
 crearteBoxPlots <- function (column_name){
-    boxplot(BostonHousing[column_name], horizontal = TRUE,  main= column_name)
+  boxplot(BostonHousing[column_name], horizontal = TRUE,  main= column_name)
 } 
 sapply(numeric_cols, FUN=crearteBoxPlots)
 
@@ -42,7 +43,7 @@ library(corrplot)
 BostonHousingNumeric <- BostonHousing[,cols]    # Fetching the data frame with only numeric columns
 cor_matrix <- cor(BostonHousingNumeric)         # Building the correlation plot
 dev.off()                                       # Closes all the previous plot windows
-corrplot(cor_matrix, method="circle")           # plotting the correlation matrix
+corrplot(cor_matrix, method="number")           # plotting the correlation matrix
 
 
 
@@ -53,11 +54,11 @@ corrplot(cor_matrix, method="circle")           # plotting the correlation matri
 library(reshape)
 
 fetchTopCorrelation <- function(matrix, num_top_elements){
-    matrix_abs <- abs(matrix)
-    matrix_abs[lower.tri(matrix_abs, diag = TRUE)] <- NA  # Initialize all the diagonal elements and the lower triangular region to NA
-    matrix_abs <- na.omit(melt(matrix_abs))   # Convert the table into data frame like structure with their corresponding values
-    matrix_abs <- matrix_abs[order(-(cor_matrix_abs$value)),]   # Sort the dataframe in descending order based on the column value that hold the absolute correlation coefficient 
-    return (cor_matrix_abs[1:num_top_elements,] )
+  matrix_abs <- abs(matrix)
+  matrix_abs[lower.tri(matrix_abs, diag = TRUE)] <- NA  # Initialize all the diagonal elements and the lower triangular region to NA
+  matrix_abs <- na.omit(melt(matrix_abs))   # Convert the table (With NA on lower triangular region and diagonal elements) into data frame like structure with their corresponding values and simultaneouly omit all NA's. In short this outputs a dataframw like stucture with the corelation between elements of only the upper traingular region.
+  matrix_abs <- matrix_abs[order(-(matrix_abs$value)),]   # Sort the dataframe in descending order based on the column "value"- that hold the absolute correlation coefficient 
+  return (matrix_abs[1:num_top_elements,] )  # Fetch the top desired elements
 }
 
 topELements = fetchTopCorrelation(cor_matrix, 3)   # Finally select the top three elements
@@ -83,11 +84,11 @@ library('tidyr')
 library(gdata)
 url = 'http://www.espn.com/nfl/superbowl/history/mvps'
 
-page <- read_html(url)    # access the Url and fetches the head and the body
-superBowl_tab <- html_nodes(page, css = 'table')    # The css='table' captures the part from the html page
-t <- superBowl_tab[[1]]
-superBowl_dat <- html_table(superBowl_tab)[[1]]
-superBowl_dat <- data.frame(superBowl_dat)[-1:-2,]
+page <- read_html(url)    # access the Url and fetch the head and the body of the page and put it into a list
+superBowl_tab <- html_nodes(page, css = 'table')    # The css='table' captures the tabular part from the html page
+t <- superBowl_tab[[1]]   # Get the element from the list
+superBowl_dat <- html_table(superBowl_tab)[[1]]     # Finally get the data
+superBowl_dat <- data.frame(superBowl_dat)[-1:-2,]  # Remove the first two rows, The second row is the column name but we hardcode it as below
 names(superBowl_dat) <- c("NO", "Player", "Highlights")
 head(superBowl_dat)
 
@@ -98,11 +99,12 @@ head(superBowl_dat)
 # MVP1, MVP2, Position, Team
 # Doubt: Would [MVP1,MVP2,position,Team] be [Bart,Starr,QB,Green Bay] for the first record
 extractNmsPosTm <- function(val){
-  playerName <- unlist(strsplit(val[1], " "))
-  return (c(playerName[1], playerName[2], val[2], val[3]))# We dont have to worry if the string val doesnt have enough value. In such a case R automatically assigns NA as a value
+  playerName <- unlist(strsplit(val[1], "&"))
+  return (c(trimws(playerName[1]), trimws(playerName[2]), trimws(val[2]), trimws(val[3])))# We dont have to worry if the string val doesnt have enough value. In such a case R automatically assigns NA as a value
 }
 
-mat <- sapply(a, FUN = extractNmsPosTm) 
+playerInfo = strsplit(superBowl_dat$Player, ",")
+mat <- sapply(playerInfo, FUN = extractNmsPosTm) 
 superBowl_dat$MVP1 <- mat[1,]
 superBowl_dat$MVP2 <- mat[2,]
 superBowl_dat$Position <- mat[3,]
@@ -120,41 +122,54 @@ head(superBowl_dat)
 # to tackle these problems in the wild.
 
 # Doubts: 
-# 1. The Data here is pretty small. So its quite visible that the pattern is "value yards passing". However in real world problems we can have errors such as spellings mistakes, the yard mentioned in different order
-
-# Steps to take:
-  # To avoid manual error or other poteintial error we first collect all the passing yard values using regex operation and then perform a simple outlier detection to see if some unwanted values are picked-up. If so then we manually go and check the row.
+# 1. The Data here is pretty small. So its quite visible that the pattern is "value yards passing". However in real world problems we can have errors such as spellings mistakes, the yard mentioned in different order (passing yards value)
 
 
+# Function to extract the passing yard information
 passsingYards <- function(val){
   if (grepl("\\d{2,3}\\s+(yards|yard)\\s+pass", val)==TRUE){
     return (as.numeric(gsub("(\\d{2,3})\\s+(yard|yards)\\s+pass.*$",'\\1', val)))
-  }  # Will match any string with yard, pass and with number more than 2 digit and extraxt the digit information
+  }
+# Will match any string with yard, pass and with number with 2 digits or 3 digits and extraxt the digit information
 }
 
-# Check if their are outliers (If the plot is skewed),
-yard_arr <- unlist(sapply(superBowl_dat$Highlights, FUN=passsingYards), use.names = FALSE)
-boxplot(yard_arr, horizontal = TRUE, main='Length in Yard')
-stripchart(yard_arr, add = TRUE, pch = 20, col = 'blue')    # The data seems good
-
-# Finding confidence interval
+# Function to find the confidence Interval
 CI <- function(input_data, confidence){
   n <- length(input_data)
   mean_yard <- mean(yard_arr)
   sd_yard <- sd(input_data)
-  print (mean_yard)
-  print (sd_yard)
   std_err <- sd_yard/sqrt(n)
+  alpha <- (1-confidence)/2
   
   # Using Computing Confidence interval from the T-distribution
-  int_err <- qt(confidence,df=n-1)*std_err
+  int_err <- qt(confidence+alpha,df=n-1)*std_err
+  
+  # t.test(input_data,mu=3)
   min_thresh <- mean_yard-int_err
   max_thresh <- mean_yard+int_err
+  
+  print (n)
+  print (alpha)
+  print (confidence)
+  print (mean_yard)
+  print (sd_yard)
+  print (std_err)
   print (min_thresh)
   print (max_thresh)
   return (list(confidence*100, min_thresh, max_thresh))
 }
 
+# Step -1 Get the data for only Quarterbacks using the Position column.
+qrtrBacks <- subset(superBowl_dat,superBowl_dat$Position =='QB')
+
+# Step -2 Use the above function to get the data for passing yards using for only quarterbacks
+yard_arr <- unlist(sapply(qrtrBacks$Highlights, FUN=passsingYards), use.names = FALSE)
+
+# Step -3 Check if their are outliers (If the plot is skewed),
+boxplot(yard_arr, horizontal = TRUE, main='Length in Yard')
+stripchart(yard_arr, add = TRUE, pch = 20, col = 'blue')    # The data seems good
+
+# Step -4 Find the CI interval for the mentioned Confidence value
 ConfidenceInterval <- as.data.frame(CI(yard_arr, c(0.9, 0.925, 0.95, 0.975, 0.99)), col.names = c("Confidence %", "min_thrsh","max_thresh"))
 ConfidenceInterval
 
@@ -181,7 +196,7 @@ sapply(values, class)
 head(df)
 # Fit ANOVA just like normal model fit to a data frame.
 sapply(df, class)
-fit1 <- aov(values~food_var, data=df)
+fit <- aov(values~food_var, data=df)
 fit
 summary(fit)
 
@@ -198,13 +213,24 @@ summary(fit)
 install.packages('lubridate')
 library('lubridate')
 
+# Create a vectore with all the dates between the given dates
+# dateVector <- seq(as.Date("2017-01-01"), as.Date("2017-03-01"), by="days")
+# countJanTuesday <- sum(sapply(dateVector, FUN=getNumTuesdaysFirstMonth))
+dateVector <- seq(as.Date("1801-01-01"), as.Date("1901-12-31"), by="days")
+dfIfTuesday = data.frame(date=dateVector)
+
+dfIfTuesday$Tuesday = wday(dfIfTuesday$date,label=TRUE) == "Tues"
+dfIfTuesday$day1 = day(dfIfTuesday$date) == 1
+numTuesday1 <- sum(dfIfTuesday$Tuesday & dfIfTuesday$day1)
 
 
 
 
 
 
-##################################  Miscellaneous (Analysis)  ##################################
+
+
+##################################  PART 2 Miscellaneous (Analysis)  ##################################
 # Question 11: In the Boston Housing data set, what is the relationship between crime and housing prices? Please support your claims with exploratory analysis conducted in R. Does this relationship make sense? Justify your answer. IE: What are some reasons this relationship makes sense or does not make sense?
 plot(BostonHousing$crim, BostonHousing$medv)
 plot(BostonHousing$crim, BostonHousing$rm)
@@ -233,5 +259,3 @@ cor(BostonHousing$nox, BostonHousing$dis)
 
 plot(BostonHousing$nox, BostonHousing$indus)
 cor(BostonHousing$nox, BostonHousing$indus)
-
-

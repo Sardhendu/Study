@@ -135,7 +135,7 @@ data <- read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/adu
 data <- data.frame(data=data)
 #colnames(data) = c('age','workclass','fnlwgt','education','education-num','marital-status','occupation','relationship','race','sex','capital-gain','capital-loss','hours-per-week', 'native-country','incomeLevel')
 
-colnames(data) = c('age','workclass','fnlwgt','education','education_num','marital_status','occupation','relationship','race','sex','capital_gain','capital_loss','hours_per_week', 'native_country','incomeLevel')
+
 
 
 

@@ -65,3 +65,44 @@ np.dot(B,C)/(pow(sum([pow(i,2) for i in B]), 0.5) * pow(sum([pow(i,2) for i in C
 
 
 
+########## On information gain
+# Information Gain = Entropy(Class) - weighted[Entropy(Class|split(x))]
+
+from __future__ import division
+import numpy as np
+
+
+a = 4
+b = 5
+c = a + b 
+entropy_before = -1 * ((a/c)*np.log2(a/c) + (b/c)*np.log2(b/c))
+
+
+tot = 9 
+d=3
+e=1
+f=d+e
+weight_x1 = f/tot
+g=4
+h=1
+i=g+h
+weight_x2 = i/tot
+
+entropy_x1 = weight_x1 * ( (-1 * (d/f)*np.log2(d/f)) + (-1 * (e/f)*np.log2(e/f)) )
+entropy_x2 = weight_x2 * (-1 * ((g/i)*np.log2(g/i) + (h/i)*np.log2(h/i)))
+
+entropy_after = entropy_x1 + entropy_x2
+
+Information_gain = entropy_before - entropy_after
+
+
+
+# For three class category
+a = 3
+b = 3
+c = 3
+d = a + b + c
+entropy_before = -1 * ((a/d)*np.log2(a/d) + (b/d)*np.log2(b/d) + (c/d)*np.log2(c/d))
+
+
+
