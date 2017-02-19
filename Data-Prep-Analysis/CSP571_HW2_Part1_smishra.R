@@ -100,7 +100,8 @@ head(superBowl_dat)
 # Doubt: Would [MVP1,MVP2,position,Team] be [Bart,Starr,QB,Green Bay] for the first record
 extractNmsPosTm <- function(val){
   playerName <- unlist(strsplit(val[1], "&"))
-  return (c(trimws(playerName[1]), trimws(playerName[2]), trimws(val[2]), trimws(val[3])))# We dont have to worry if the string val doesnt have enough value. In such a case R automatically assigns NA as a value
+  return (c(trimws(playerName[1]), trimws(playerName[2]), trimws(val[2]), trimws(val[3])))
+  # We dont have to worry if the string val doesnt have enough value. In such a case R automatically assigns NA as a value
 }
 
 playerInfo = strsplit(superBowl_dat$Player, ",")
