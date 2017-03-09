@@ -518,14 +518,14 @@ rm(list = ls())
   # To fix this problem we have to remove the column car_name from our train ans test sample data set refit the model
 # --------------------------------------------------------
   
-  
-  sapply(autoMPG.datumVarDtype, class)
   autoMPG.datumVarDtypeClean <- na.omit(autoMPG.datumVarDtype)
-  summary(autoMPG.datumVarDtypeClean)
-  autoMPG.datumVarDtypeClean$car_name
+  autoMPG.dataBad <- autoMPG.datumVarDtypeClean#[significantFeatures]
+  colnames(autoMPG.dataBad)
+  autoMPG.trainDataBad <- autoMPG.dataBad[trainIndices,]
+  autoMPG.trainDataBad$car_name <- autoMPG.datumVarDtypeClean$car_name[trainIndices]
+  autoMPG.testDataBad <- autoMPG.dataBad[-trainIndices,]
+  autoMPG.testDataBad$car_name <- autoMPG.datumVarDtypeClean$car_name[-trainIndices]
   
-  autoMPG.trainDataBad <- autoMPG.datumVarDtypeClean[trainIndices,]
-  autoMPG.testDataBad <- autoMPG.datumVarDtypeClean[-trainIndices,]
   stopifnot(nrow(autoMPG.trainDataBad) + nrow(autoMPG.testDataBad) == nrow(autoMPG.datumVarDtypeClean))
   
   
@@ -566,52 +566,60 @@ rm(list = ls())
     stopifnot(autoMPG.fixed.model.lin.SSE + autoMPG.fixed.model.lin.SSR == autoMPG.fixed.model.lin.SST)
     
     # Calculate R_squared
-    autoMPG.fixed.model.r_sq <- autoMPG.fixed.model.lin.SSR / autoMPG.fixed.model.lin.SST
-    autoMPG.fixed.model.r_sq
+    autoMPG.fixed.model.r_sq1 <- autoMPG.fixed.model.lin.SSR / autoMPG.fixed.model.lin.SST
+    autoMPG.fixed.model.r_sq1
     # r_sq = 0.6713278  .  Not a good model as the r_sq further decreases in test data, a cause for overfitting
-    autoMPG.fixed.model.r_sq <- autoMPG.fixed.model.lin.SSR/(autoMPG.fixed.model.lin.SSR + autoMPG.fixed.model.lin.SSE)
+    autoMPG.fixed.model.r_sq2 <- autoMPG.fixed.model.lin.SSR/(autoMPG.fixed.model.lin.SSR + autoMPG.fixed.model.lin.SSE)
+    autoMPG.fixed.model.r_sq2
 
     
 # Fixing2 : ---------------------------------------------
-    library(RecordLinkage)
-    car_names <- autoMPG.datumVarDtype$car_name
-    
-    # brandDataframe 
-    brandName <- function (carname){
-      cname <- as.character(carname)
-      initials <- unlist(strsplit(cname, " "))[1]
-      initialList <- c(initialList, initials)
-      if (initials == 'vw'){
-        return("volkswagen")
-      }
-      return (initials)
-    }
-    
-    initials <- sapply(car_names, FUN=brandName)
-    
-    # Store it into a dataframe:
-    initials <- data.frame(initials)
-
-    uniqueCount <- sqldf("select initials as brand, count(*) as occurance from initials group by initials")  # We see that some spellings are wrong
-    
-    sapply(uniqueCount["brand"], class)
-    uniqueBrands <- c(uniqueCount["brand"])
-    uniqueBrands$brand
-  
-    library('stringdist')
-    library('dplyr')
-    # The below script just finds the carname that are mis - spelled
-    jaroDistMatrix <- 1-stringdistmatrix(uniqueBrands$brand,useNames="strings",method="jw")
-    kpm <- data.frame(as.matrix(jaroDistMatrix))
-    
-    simThresh <- 0.8
-    idx <- apply(kpm, 2, function(x) x >0.8)
-    idx <- apply(idx, 1:2, function(x) if(isTRUE(x)) x<-1 else x<-NA)
-    matrix_abs <- na.omit(melt(idx)) 
-    
-    # Now we replace all the 
-    
-    sqldf("select a.Var1, b.Var1 from matrix_abs as a join matrix_abs as b on a.Var1=b.Var2 and a.var2=b.var1")
+    # library(RecordLinkage)
+    # library(sqldf)
+    # car_names <- autoMPG.datumVarDtype$car_name
+    # 
+    # # brandDataframe 
+    # brandName <- function (carname){
+    #   cname <- as.character(carname)
+    #   initials <- unlist(strsplit(cname, " "))[1]
+    #   if (initials == 'vw'){
+    #     return("volkswagen")
+    #   }
+    #   return (initials)
+    # }
+    # 
+    # initials <- sapply(car_names, FUN=brandName)
+    # initials <- data.frame(initials)
+    # 
+    # 
+    # uniqueCount <- sqldf("select initials as brand, count(*) as occurance from initials group by initials")  # We see that some spellings are wrong
+    # uniqueCount
+    # 
+    # library('stringdist')
+    # library('dplyr')
+    # # The below script just finds the carname that are mis - spelled
+    # jaroDistMatrix <- 1-stringdistmatrix(uniqueBrands$brand,useNames="strings",method="jw")
+    # jaroDistMatrix <- data.frame(as.matrix(jaroDistMatrix))
+    # 
+    # simThresh <- 0.8
+    # idx <- apply(jaroDistMatrix, 2, function(x) x >0.8)
+    # idx <- apply(idx, 1:2, function(x) if(isTRUE(x)) x<-1 else x<-NA)
+    # matrix_abs <- na.omit(melt(idx)) 
+    # 
+    # # Now we replace all the 
+    # 
+    # sqldf("select a.Var1, b.Var1 from matrix_abs as a join matrix_abs as b on a.Var1=b.Var2")
+    # 
+    # initialsNew <- initials
+    # aa <- function(row, dfIN) {
+    #   origName <- dfIN[row,"Var1"]
+    #   print (as.character(origName))
+    #   indices <- which(initialsNew == as.character(origName))
+    #   print (indices)
+    #   initialsNew[indices,"initials"] <- as.character(origName)
+    # }
+    # # by(matrix_abs, 1:nrow(matrix_abs), FUN=aa)
+    # sapply(1:nrow(matrix_abs), FUN=aa, matrix_abs)
     
     
     
@@ -627,7 +635,7 @@ rm(list = ls())
   
     
 # Theory : -----------------------------------------------
-    # As it can be seen from the regression output that, the model_year 74,75,,76,77,78,79,80,81,82 are significant with a 96% confidence, which also says that "model_year" explains the variation in "MPG" and hence is related to the "MPG". As a complement to the regression model it can also be viewed from the groupTable and the scatter plot that despite the "mpg" for different years are speread across many values, the data follows a pattern i.e. Every year the min value of "mpg" and maximum value of "mpg" marginally increases from its preceding year (with an exception of 1971, 1979 and 1981). This relationship makes sense because significant improvement in technology every year would foster more feul efficient vehicles.
+    # As it can be seen from the regression summary that, the model_year 72 and 73 are not significant. This is also be intuitively explained by the scatterplot, which means that the means of base line model "model_year=70" and "model_year=72,73" are not very different (The cooficient of model_year=72 and 73) dont add much to the model. However, model_year 74,76,77,78,79,80,81,82 are significant with a 96% confidence, which also says that "model_year" explains the variation in "MPG" and hence is related to the "MPG". As a complement to the regression model it can also be viewed from the groupTable and the scatter plot that despite the "mpg" for different years are spread across many values, the data follows a pattern i.e. Every year the min value of "mpg" and maximum value of "mpg" marginally increases from its preceding year (with an exception of 1971, 1979 and 1981). This relationship makes sense because significant improvement in technology every year would foster more feul efficient vehicles.
     
     # The chi-square value produces a p-value very less, 
     # H0: The categorical column ntile(mpg) and the model_year are independent of each other
@@ -636,9 +644,10 @@ rm(list = ls())
 #  --------------------------------------------------------
     
     
-  # Test 1 : Using Regression 
+  # Test 1 : Using Regression Summary
   regression.Model <- lm(autoMPG.datumClean$mpg~autoMPG.datumClean$model_year)
   summary(regression.Model)
+  summary(autoMPG.fixed.model.lin)
 
   
   # Test 2 : Using scatterplot 
@@ -689,6 +698,18 @@ rm(list = ls())
   # 5: So we fix the other independent variables ("model_year" and "origin") and then step-by-step evaluate other features by adding them to the model.
   
   # 6: Since we see that many of the features set are skewed so doing a log transformation would help. Lets do it now.
+  
+###### Answer ########
+  # The best model by R_sq is Model 3:
+      # Model: mpg ~ model_year + cylinders + horsepower + displacement
+      # training_Data: R_square = 0.9113
+      # test_data: R_sq1 = 0.9007224: 
+      # test_data: R_sq1 = 0.9000995:
+  # The best model overall (ocam's Razor) is Model 4: 
+      # Model: mpg ~ model_year + cylinders + horsepower + displacement
+      # training_Data: R_square = 0.9016
+      # test_data: R_sq1 = 0.8806303: 
+      # test_data: R_sq1 = 0.8953331:
 #-------------------------------------------------------
 
   
@@ -846,7 +867,7 @@ rm(list = ls())
         
   
   # BEST Model 4: (Log Transformed)  ---------------------------------------------
-    # Output: 
+        # Output: 
         # Model: mpg ~ model_year + cylinders + horsepower + displacement
         # training_Data: R_square = 0.9016
         # test_data: R_sq1 = 0.8806303: 
@@ -877,4 +898,5 @@ rm(list = ls())
         autoMPG.best.model4.r_sq2 <- autoMPG.best.model4.lin.SSR / autoMPG.best.model4.lin.SST2
         autoMPG.best.model4.r_sq2
         
+
         
