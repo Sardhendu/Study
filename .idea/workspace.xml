@@ -2,18 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e3c99960-01a8-47bb-ae25-1109a42f8cc9" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/CTCI/Chapter2/LinkedList.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/CTCI/Chapter2/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/CTCI/Chapter2/delete_middle_node.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/CTCI/Chapter2/k_to_n.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/CTCI/Chapter2/partition.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/CTCI/Chapter2/remove_duplicates.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/CTCI/Chapter2/sum_list.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/CTCI/stacks_queues.py" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/CTCI/chapter2.py" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/CTCI/Chapter2/check_palindrome.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -38,11 +27,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="sum_list.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="sum_list.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/CTCI/Chapter2/sum_list.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1400">
-              <caret line="70" column="13" lean-forward="true" selection-start-line="70" selection-start-column="13" selection-end-line="70" selection-end-column="13" />
+            <state relative-caret-position="692">
+              <caret line="73" column="30" lean-forward="true" selection-start-line="67" selection-start-column="0" selection-end-line="73" selection-end-column="30" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="check_palindrome.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/CTCI/Chapter2/check_palindrome.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="780">
+              <caret line="39" column="11" lean-forward="false" selection-start-line="39" selection-start-column="11" selection-end-line="39" selection-end-column="11" />
               <folding />
             </state>
           </provider>
@@ -51,8 +50,8 @@
       <file leaf-file-name="LinkedList.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/CTCI/Chapter2/LinkedList.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="940">
-              <caret line="48" column="24" lean-forward="false" selection-start-line="48" selection-start-column="8" selection-end-line="48" selection-end-column="24" />
+            <state relative-caret-position="692">
+              <caret line="65" column="0" lean-forward="true" selection-start-line="65" selection-start-column="0" selection-end-line="65" selection-end-column="0" />
               <folding>
                 <element signature="e#0#26#0" expanded="true" />
               </folding>
@@ -77,7 +76,12 @@
       <find>i</find>
       <find>next</find>
       <find>LinkedListNode</find>
+      <find>len(list1)</find>
+      <find>curr</find>
     </findStrings>
+    <replaceStrings>
+      <replace>len_list1</replace>
+    </replaceStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -109,6 +113,7 @@
         <option value="$PROJECT_DIR$/CTCI/Chapter2/remove_duplicates.py" />
         <option value="$PROJECT_DIR$/CTCI/Chapter2/partition.py" />
         <option value="$PROJECT_DIR$/CTCI/Chapter2/sum_list.py" />
+        <option value="$PROJECT_DIR$/CTCI/Chapter2/check_palindrome.py" />
       </list>
     </option>
   </component>
@@ -206,7 +211,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.sum_list">
+  <component name="RunManager" selected="Python.check_palindrome">
     <configuration name="Study" type="Python.Ipnb" factoryName="Jupyter Notebook">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -223,19 +228,19 @@
       <option name="ipnbHost" value="127.0.0.1" />
       <option name="ipnbPort" value="8888" />
     </configuration>
-    <configuration name="chapter2" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="check_palindrome" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/CTCI" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/CTCI/Chapter2" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="Study" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/CTCI/Chapter2/remove_duplicates.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/CTCI/Chapter2/check_palindrome.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -310,19 +315,19 @@
     </configuration>
     <list size="6">
       <item index="0" class="java.lang.String" itemvalue="Jupyter Notebook.Study" />
-      <item index="1" class="java.lang.String" itemvalue="Python.chapter2" />
-      <item index="2" class="java.lang.String" itemvalue="Python.k_to_n" />
-      <item index="3" class="java.lang.String" itemvalue="Python.delete_middle_node" />
-      <item index="4" class="java.lang.String" itemvalue="Python.partition" />
-      <item index="5" class="java.lang.String" itemvalue="Python.sum_list" />
+      <item index="1" class="java.lang.String" itemvalue="Python.k_to_n" />
+      <item index="2" class="java.lang.String" itemvalue="Python.delete_middle_node" />
+      <item index="3" class="java.lang.String" itemvalue="Python.partition" />
+      <item index="4" class="java.lang.String" itemvalue="Python.sum_list" />
+      <item index="5" class="java.lang.String" itemvalue="Python.check_palindrome" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.sum_list" />
-        <item index="1" class="java.lang.String" itemvalue="Python.partition" />
-        <item index="2" class="java.lang.String" itemvalue="Python.k_to_n" />
-        <item index="3" class="java.lang.String" itemvalue="Python.delete_middle_node" />
-        <item index="4" class="java.lang.String" itemvalue="Python.chapter2" />
+        <item index="0" class="java.lang.String" itemvalue="Python.check_palindrome" />
+        <item index="1" class="java.lang.String" itemvalue="Python.sum_list" />
+        <item index="2" class="java.lang.String" itemvalue="Python.partition" />
+        <item index="3" class="java.lang.String" itemvalue="Python.k_to_n" />
+        <item index="4" class="java.lang.String" itemvalue="Python.delete_middle_node" />
       </list>
     </recent_temporary>
   </component>
@@ -360,19 +365,19 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.18625894" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.31652105" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39924315" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31652105" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39924315" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="TODO" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -403,13 +408,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="7" column="11" lean-forward="false" selection-start-line="7" selection-start-column="11" selection-end-line="7" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Data_Mining/Assign-4.ipynb">
       <provider selected="true" editor-type-id="ipnb-editor">
         <state>
@@ -739,8 +737,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/CTCI/Chapter2/LinkedList.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="940">
-          <caret line="48" column="24" lean-forward="false" selection-start-line="48" selection-start-column="8" selection-end-line="48" selection-end-column="24" />
+        <state relative-caret-position="692">
+          <caret line="65" column="0" lean-forward="true" selection-start-line="65" selection-start-column="0" selection-end-line="65" selection-end-column="0" />
           <folding>
             <element signature="e#0#26#0" expanded="true" />
           </folding>
@@ -749,8 +747,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/CTCI/Chapter2/sum_list.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1400">
-          <caret line="70" column="13" lean-forward="true" selection-start-line="70" selection-start-column="13" selection-end-line="70" selection-end-column="13" />
+        <state relative-caret-position="692">
+          <caret line="73" column="30" lean-forward="true" selection-start-line="67" selection-start-column="0" selection-end-line="73" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CTCI/Chapter2/check_palindrome.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="780">
+          <caret line="39" column="11" lean-forward="false" selection-start-line="39" selection-start-column="11" selection-end-line="39" selection-end-column="11" />
           <folding />
         </state>
       </provider>
