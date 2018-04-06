@@ -1,0 +1,378 @@
+---
+title: "Bayesian Analysis"
+output: html_notebook
+---
+
+Vanila Linear Regression : Using R
+```{r}
+library("car")
+data("Leinhardt")
+head(Leinhardt)
+```
+
+```{r}
+str(Leinhardt)
+```
+
+
+```{r}
+pairs(Leinhardt)
+```
+
+It can be seen from the pairs plot that the relationship between continuous variables (income and infant) is not linear. For variables infant and income the distribution seems heavily right skewed
+```{r}
+plot(infant ~ income, data = Leinhardt)
+```
+Just to confirm if the plot are histogram
+```{r}
+par(1,2)
+hist(Leinhardt$income)
+hist(Leinhardt$infant)
+```
+
+Lets plot the variable in the log scale and see if the relationship becomes linear. Yes they seem linear now.
+```{r}
+plot(log(infant)~log(income), data=Leinhardt)
+```
+
+MODELING : With vanila Linear Regression on the linear scale using only the income as variable.
+We can see that the R-squred is barely doing good. It makes sense becasue evan though the data seemed a good fit, it is visible that not all the variability is explained by the variable income. However, the variable is significant
+```{r}
+dat = na.omit(Leinhardt)
+dat$log_income = log(dat$income)
+dat$log_infant = log(dat$infant)
+lmod = lm(log_infant ~ log_income, data=dat)
+summary(lmod)
+```
+
+# RECREATING THE MODEL WITH JAGGS -> THE BAYESIAN INTERPRETATION
+
+LIKELIHOOD: say the response variable comes from a normal distribution with mean (mu) and variance (prec)
+  # b[1] is the intercept term and b[2] is the coefficient for the explanatory variable income and b[3] is oil indicator
+  # Note we do it in log scale
+
+PRIOR, The priors are assigned to the variables b[1] and b[2], b[3].
+  # We assume a non-informative prior, where we say tha the prior takes from a normal distribution with   # infinite variance, which makes it a flat distribution. Note: Unlike flat uniform distribution,
+  # the normal distribution is not bounded here. Because we are doing a linear regression it is not 
+  # advisable to bound the variable in a fixed interval
+  
+# Going back to out lessons: We know when the mean (mu) of y is known then the prior for the  
+  # parameter variance (prec) of y can be taken as a Inv-Gamma distribution. We already know 
+  # mu = b0 + b1x, lets take variance from Inv-Gamma.
+  
+  ## NOTE: Important: We saw that jaggs take input for 'sd' as 1/sd. So instead of doing Inv-Gamma, we
+  # can actually do a gamma prior and 'not' inverse it. The gamma distribution depends on two
+  # hyperparameter 'shape' and 'rate'. 
+```{r}
+library(rjags)
+# Jaggs takes in the model as a input string
+
+mod1_string = " model{
+
+  # LIKELIHOOD: say the response variable comes from a normal distribution with mean (mu) and variance (prec)
+  # b[1] is the intercept term and b[2] is the coefficient for the explanatory variable income
+  # Note we do it in log scale
+
+  for (i in 1:n){
+    y[i] ~ dnorm(mu[i], prec)
+    mu[i] = b[1] + b[2]*log_income[i] + b[3]*is_oil[i]
+  }
+
+
+  # PRIOR, The priors are assigned to the variables b[0] and b[1].
+  # We assume a non-informative prior, where we say tha the prior takes from a normal distribution with
+  # infinite variance, which makes it a flat distribution. Note: Unlike flat uniform distribution,
+  # the normal distribution is not bounded here. Because we are doing a linear regression it is not 
+  # advisable to bound the variable in a fixed interval
+
+  for (j in 1:3) {
+    b[j] ~ dnorm(0.0, 1/1.0e6)   
+  }
+  
+  # Going back to out lessons: We know when the mean (mu) of y is known then the prior for the  
+  # parameter variance (prec) of y can be taken as a Inv-Gamma distribution. We already know 
+  # mu = b1 + b2x + b3x2, lets take variance from Inv-Gamma.
+  
+  ## NOTE: Important: We saw that jaggs take input for 'sd' as 1/sd. So instead of doing Inv-Gamma, we
+  # can actually do a gamma prior and 'not' inverse it. The gamma distribution depends on two
+  # hyperparameter 'shape' and 'rate'. 
+
+  prior_sample_size = 5 
+  prior_guess_for_variance = 10 
+  prec ~ dgamma(prior_sample_size/2, prior_sample_size*prior_guess_for_variance/2)
+  sig2 = 1/prec 
+
+  sig = sqrt(sig2)
+  
+} "
+
+```
+
+SETTING UP THE MODEL- TO RUN
+```{r}
+set.seed(75)
+
+# Feeding inputs to the Jaggs Model
+data1_jags = list(y=dat$log_infant, n=nrow(dat), log_income=dat$log_income, is_oil=as.numeric(dat$oil=="yes"))
+
+# Fetch the parameters that we would want to monitor
+params1 = c("b", "sig")
+
+# Provide the model with the initial variables
+inits1 = function(){
+  # We sample two values from the normal distribution for each b1, b2 and b3. 
+  # Here we use the normal distribution from R package hence we use sd instead of 1/sd
+  inits = list("b"=rnorm(3, mean = 0.0, sd=100),
+               "prec"=rgamma(1, shape = 1.0, rate = 1.0)) # actually a exponential distribution
+  
+  
+}
+```
+
+Specify the model and simulate
+```{r}
+
+# Specify the model for 3 different Markov chains
+mod1 = jags.model(textConnection(mod1_string), data=data1_jags, inits = inits1, n.chains = 3)
+
+# Give the model a burn-in period to atleast reach settle in its parameter search space
+update(mod1, 1000)
+
+# Create Posterior simulations
+mod1_sim = coda.samples(model=mod1, variable.names=params1, n.iter=5e3)
+
+# Cobine the 3 markov chain simulations
+mod1_csim = do.call(rbind, mod1_sim)
+
+```
+
+Convergence Diagnostic : 
+
+1. Trace Plots: The trace plots looks fine, we can see that the Markov chain reaches a stationary point. The three color indicates the three Markov chains we have run.
+```{r}
+plot(mod1_sim)
+```
+
+2. Gelmann and Rubin Diagnostic: The diagnoistic compares the variance in each chain to the variance between different markov chains. Any smaller value close to 1 indicate stationary state and convergence. 
+```{r}
+gelman.diag(mod1_sim)
+```
+
+3. Autocorrelation: The autocorrelation measures the lag between the samplings for a markov chain. If the autocorrelation is high say until 100 lag, that means that if we sample every 100th value (1th, 100th, 200th, 300th ...) from the markov chain then using only these samples to estimate the parameter mean and variance would make sense.
+
+A good model: A good model would have low autocorrelation in just few lags say 5 or 10. Again it depends from domain to domain.
+
+In the below autocorrelation statistics we see that the autocorrelation is high for b[1] and b[2] until 50 lag, which is not a good sign. However, the autocorrelation of sig is very low from lag1 which is a good sign for variable sig.
+```{r}
+autocorr.diag(mod1_sim)
+```
+```{r}
+library("coda")
+# autocorr.plot(as.mcmc(mod1_sim))
+mod1_sim[1][:,2]
+```
+
+4. Effective Size: 
+Since we had high autocorrelation for b[1] and b[2], it is good to check the effective size. Effective size stores the number of samples that were actually effective among all the samples.
+
+We had total 3 Markov chain and 5000 samples each, so a total of 15000. Out of all 15000 sample size, the effective sample size for b[1] is only 345 and that for b[2] is 351, which is quite low.
+```{r}
+effectiveSize(mod1_sim)
+```
+
+5. POSTERIOR SUMMARY: The posterior summary looks very similar to the vanilla linear regression summary
+
+LM model:
+b1: 7.145, b2: -0.511, sig (standard error): 0.6867
+
+Posterior Model:
+b1: 7.19, b2: -0.588, sig (standard error): 0.9714
+
+b1 and b2 estimate are quite close, but the sig varies a lot. This is because of our prior belief that
+prior_sample_size = 5 
+prior_guess_for_variance = 10 
+
+If we are not very sure of prior, we would lower the value and woult therefore get a small sig.
+```{r}
+summary(mod1_sim)
+```
+```{r}
+summary(lmod)
+```
+
+
+6. Residual Summary:
+Understanding residual is a very important diagnostic becasue they can show any sign of violation in our assumption. In particular we are looking for below signs. 
+  1. the model is not linear,
+  2. the observation are not independent from each other,
+  3. the model is not normally distributed
+
+----> Framing the problem: From the Bayesian estimation we got a estimated mean for b[0], b[1] and sig
+Here we just construct them to make dot products and predictions on the same sample data using the parameters estimated from Bayesian model.
+```{r}
+X = cbind(rep(1.0, data1_jags$n), data1_jags$log_income, data1_jags$is_oil)
+print ('X matrix')
+print (head(X))
+
+pm_params1 = colMeans(mod1_csim)
+print('Parameter Mean')
+print(pm_params1)
+
+y_hat1 = X %*% pm_params1[1:3]
+print ('Predicted values')
+print (head(y_hat1))
+
+# Convert y_hat into a vectors
+y_hat1 = drop(y_hat1)
+
+# Get the residuals
+resid1 = data1_jaggs$y - y_hat1
+```
+
+----> Residual plot: Residual plot is a good check for linearity. Any curve pattern in residual plot would indicate polynomial fit to data. NOTE: All the statistics are measured on the LOG scale to our bayesian fit. Hence teh data was never linear.
+The residual plot looks much better, random, there seems to be no pattern
+```{r}
+plot(resid1)
+```
+
+----> Prediction Vs Residual: Looks pretty good, no trends. 
+  1. The residual mean seems to be appx 0, hence linearity verified
+  2. The residual variance however tends to increase as we go from small predicted values to large predicted values
+  3. We see two outliers, not strong but atleast 3 sd away from the mean of the residual plot
+```{r}
+plot(y_hat1, resid1)
+```
+
+----> QQ-plot: The qq-plot check our assumtion of normality. This plot actually compares a normal distribution to the residual distribution. If the residual distribution is right or left skewed then teh normal distribution would not be compliant and we would observe curve in the QQ-plot.
+
+  1. The residuals are normal since the sampled quantiles lie in a straight line
+  2. We can even see two outlier
+
+```{r}
+qqnorm(resid1)
+```
+
+----> Outliers:
+We repeatdly saw 2 outliers in the residual plot. Here we see which countries are they
+
+1. As expected they are Saudi Arabia and Libya
+```{r}
+head(rownames(dat)[order(resid1, decreasing=TRUE)])
+```
+
+
+LETS GET RID OF THE OUTLIER: 
+THE Outlier's ARE NAMED Saudi and Libya, which could possibly mean.
+We saw that the outliers were atleast 3 standard deviation away from the mean. So it would be wise to use some distribution that would have fatter tail. WHy not draw y's from a t-distribution
+```{r}
+library(rjags)
+# Jaggs takes in the model as a input string
+
+mod2_string = " model{
+
+  # LIKELIHOOD: Here instead of assuming normal distribution we assume that y's come from a t distribution
+  # b[1] is the intercept term and b[2] is the coefficient for the explanatory variable income, and b[3] is for oil
+  # Note we do it in log scale
+
+  for (i in 1:n){
+    y[i] ~ dt(mu[i], tau, df)
+    mu[i] = b[1] + b[2]*log_income[i] + b[3]*is_oil[i]
+  }
+
+
+  # PRIOR, The priors are assigned to the variables b[1] and b[2] and b[3].
+  # We assume a non-informative prior, where we say tha the prior takes from a normal distribution with
+  # infinite variance, which makes it a flat distribution. Note: Unlike flat uniform distribution,
+  # the normal distribution is not bounded here. Because we are doing a linear regression it is not 
+  # advisable to bound the variable in a fixed interval
+
+  for (j in 1:3) {
+    b[j] ~ dnorm(0.0, 1/1.0e6)   
+  }
+  
+  # Thsi time we take y's from a t-dist, given (mu) of y is known we have to decide on the prio
+  # for tau and df (degree of freedom), tau is essentially the variance so we model it as Inv-gamma 
+  # degree of freedom can be either fixed or can be assigned a prior distribution, Let asign it 
+  # to a prior dist
+  
+  ## NOTE: Important: We saw that jaggs take input for 'sd' as 1/sd. So instead of doing Inv-Gamma, we
+  # can actually do a gamma prior and 'not' inverse it. The gamma distribution depends on two
+  # hyperparameter 'shape' and 'rate'. 
+
+  # Note: The t-dist does not have a mean and a variance if the degree of freedom is less than 2, 
+  # So lets define a prior where the t-dist has more than 2 degree fo freedom. If not done
+  # out y's likelihood would output haywired,,
+
+  df = nu + 2.0  
+  nu ~ dexp(1.0) 
+  prior_sample_size = 5 
+  prior_guess_for_variance = 10 
+  tau ~ dgamma(prior_sample_size/2, prior_sample_size*prior_guess_for_variance/2)
+  sig2 = sqrt(1.0/tau * df/(df-2.0))
+
+} "
+
+```
+
+```{r}
+set.seed(75)
+
+# Feeding inputs to the Jaggs Model
+data2_jags = list(y=dat$log_infant, n=nrow(dat), log_income=dat$log_income, is_oil=as.numeric(dat$oil=="yes"))
+
+# Fetch the parameters that we would want to monitor
+params2 = c("b", "sig2")
+
+# Provide the model with the initial variables
+inits2 = function(){
+  # We sample two values from the normal distribution for each b1, b2 and b3. 
+  # Here we use the normal distribution from R package hence we use sd instead of 1/sd
+  inits = list("b"=rnorm(3, mean = 0.0, sd=100),
+               "tau"=rgamma(1, shape = 1.0, rate = 1.0)) # actually a exponential distribution
+  
+  
+}
+```
+
+
+```{r}
+
+# Specify the model for 3 different Markov chains
+mod2 = jags.model(textConnection(mod2_string), data=data2_jags, inits = inits2, n.chains = 3)
+
+# Give the model a burn-in period to atleast reach settle in its parameter search space
+update(mod2, 1000)
+
+# Create Posterior simulations
+mod2_sim = coda.samples(model=mod2, variable.names=params2, n.iter=5e3)
+
+# Cobine the 3 markov chain simulations
+mod2_csim = do.call(rbind, mod2_sim)
+```
+
+```{r}
+plot(mod2_sim)
+```
+```{r}
+X2 = cbind(rep(1.0, data2_jags$n), data2_jags$log_income, data2_jags$is_oil)
+print ('X2 matrix')
+print (head(X2))
+
+pm_params2 = colMeans(mod2_csim)
+print('Parameter Mean')
+print(pm_params2)
+
+y_hat2 = X2 %*% pm_params2[1:3]
+print ('Predicted values')
+print (head(y_hat2))
+
+# Convert y_hat into a vectors
+y_hat2 = drop(y_hat2)
+
+# Get the residuals
+resid2 = data1_jaggs$y - y_hat2
+```
+```{r}
+plot(y_hat2, resid2)
+```
+
