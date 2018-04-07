@@ -1,0 +1,189 @@
+---
+title: "Anova_Bayesian"
+output: pdf_document
+---
+
+# Dataset PLantGrowth
+```{r}
+data("PlantGrowth")
+head(PlantGrowth)
+```
+
+### BOX plots to get a sense of the mean and variance among groups:
+We see that the means of each group are well seperated. Hmm, thats good we can use this to verify our Bayesian model.
+However the variance of each category may be different. The category 2 seems more widespread. But initially lets assume that the variance is same for all the three categories.
+```{r}
+boxplot(weight ~ group, data=PlantGrowth)
+```
+
+## Vanila Linear Model:
+
+Mean of 1st group: 5.0320
+Mean of 2nd group: 5.0321 - 0.3710 = 4.66
+Mean of 3rd group: 5.0320 + 0.4940 = 5.538
+```{r pressure, echo=FALSE}
+lmod = lm(weight ~ group, data=PlantGrowth)
+summary(lmod)
+```
+
+## ANOVA Table:
+
+HERE:
+
+Anova["group"]["Mean Sq"] = variability between the groups    = 1.8832
+Anova["group"]["Residuals "] = variability within the groups = 0.3886
+
+The ratio of the above two expression is high, so we can say that the group or factor variable is actually relevant.
+
+```{r}
+anova(lmod)
+```
+
+# Bayesian Model
+
+### Bayesian Model: 
+Unlike bayesian linear regression, here we dont have continuous values but individual group their mean and variance.
+
+Likelihood: y_i|g_i, mu, sig2 ~ N(mu_g, sig2_g) # g indicates each group and mu indicates all the means
+Since we assume same variance for each group
+Likelihood: y_i|g_i, mu, sig2 ~ N(mu_g, sig2)
+
+Prior: mu_g =  N(mu0=0, sig2_0=inf)           # we say sig2_0 is infinite hence making the distribution as flat normal
+       sig2 =  Inv-gamma(nu0, sig2_0)   # 
+```{r}
+library("rjags")
+mod_string = "model{
+  # Loop thorugh all samples to sample y's from a normal distribution, with mean = mu of the group (g) and constant 
+  for (i in 1: length(y)){
+    y[i] ~ dnorm(mu[grp[i]], sig2)
+  } 
+  
+  # We sample the prior for mu using flat normal distribution
+  for (j in 1:3){
+    mu[j] ~ dnorm(0.0, 1/1e06)  # Note in jags we provide sig and 1/sig
+  }
+  
+  prior_sample_size = 5 
+  prior_guess_for_variance = 1 
+  sig2 ~ dgamma(prior_sample_size/2, prior_sample_size*prior_guess_for_variance/2)
+  sig = sqrt(1.0/sig2)
+  
+}"
+```
+
+### Setup the experiment:
+From the jags model we have:
+Input variables: "y" and "grp"
+Output variables: 
+```{r}
+set.seed(82)
+
+data_jags = list(y=PlantGrowth$weight, grp=as.numeric(PlantGrowth$group))
+
+params = c("mu", "sig")
+
+# Create initial values, for mu and sig2 priors. We can even omit this step, if so then Jags would automatically create a new 
+# initial value.
+inits = function(){
+  inits = list("mu" = rnorm(3,0.0,100.0), "sig2" = rgamma(1,1.0,1.0))
+}
+
+# We run 3 Markov chain 
+mod = jags.model(textConnection(mod_string), data=data_jags, init = inits, n.chains=3)
+
+# Provide a 1000 iteration for burn-in
+update(mod, 1e3)
+
+library("coda")
+mod_sim = coda.samples(model=mod, variable.names=params, n.iter=5e3)
+mod_csim = as.mcmc(do.call(rbind, mod_sim))
+```
+
+## MODEL Diagnostics
+
+----> Trace PLots:
+Hmm! Looks pretty good. It seems that the markov chain has found a stationary distribution and the mean can be estimated
+```{r, fig.width=14, fig.height=15}
+plot(mod_sim)
+```
+
+------> Gelman and Rubin statistics:
+All the values are small and closer to 1. Even this looks good
+```{r}
+gelman.diag(mod_sim)
+```
+
+------> Autocorrelation:
+It seems there is no correlation even at 1 lag. Awesom :)
+```{r}
+autocorr.diag(mod_sim)
+```
+
+------> Effective Size : Num of effective iteration. We used 3 chains and 5000 samples each chain. 
+It seems all the samples were effective. Thats great
+```{r}
+effectiveSize(mod_sim)
+```
+
+## Posterior:
+Lets compare our posterior mean to the vanila linear model fit. 
+
+Hmm, they look very similar
+
+LM Model: 
+          Mean of 1st group: 5.0320
+          Mean of 2nd group: 5.0321 - 0.3710 = 4.66
+          Mean of 3rd group: 5.0320 + 0.4940 = 5.538
+          
+Posterior Model:
+          Mean of 1st group: 5.0320
+          Mean of 2nd group: 4.662
+          Mean of 3rd group: 5.5276481
+```{r}
+pm_params = colMeans(mod_csim)
+pm_params
+
+lm_params = coefficients(lmod)
+lm_params
+
+summary(mod_sim)
+```
+
+### Confidence Interval
+```{r}
+# 95% confidence interval
+HPDinterval(mod_csim)
+
+# 90% confidence interval
+HPDinterval(mod_csim, 0.9)
+```
+
+### Posterior yeilds:
+The benifit of having bayesian with MCMC sampling is that, it is very easy to compute the posterior probabilities of groups
+```{r}
+# Say we want to know the yeild or probability that the mean of a particular group is greater the mean of another group. We can use the MCMC # samples to determine that
+mean(mod_csim[,3] > mod_csim[,1])
+mean(mod_csim[,3] > mod_csim[,2])
+mean(mod_csim[,2] > mod_csim[,1])
+
+# Suppose we want to determine the probability that the mean of a particular group is 1.1 grater than the mean of other group
+mean(mod_csim[,3] > 1.1*mod_csim[,1])
+```
+
+
+
+## Posterior Residual Analysis:
+THere seems to be no pattern, the residuals seems pretty random
+```{r}
+yhat = pm_params[1:3][data_jags$grp]
+resid = data_jags$y - yhat
+plot(resid)
+```
+
+-----> yhat Vs residuals
+It seems that catagory 1 have more variability within compared to category 2 and 3. This could mean that our assumption of same variance for each group was not right. We should account for different variance from each group
+```{r}
+# y_hat Vs Residuals
+plot(yhat, resid)
+```
+

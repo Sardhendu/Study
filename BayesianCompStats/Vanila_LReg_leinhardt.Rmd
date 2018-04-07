@@ -47,22 +47,6 @@ summary(lmod)
 
 # RECREATING THE MODEL WITH JAGGS -> THE BAYESIAN INTERPRETATION
 
-LIKELIHOOD: say the response variable comes from a normal distribution with mean (mu) and variance (prec)
-  # b[1] is the intercept term and b[2] is the coefficient for the explanatory variable income and b[3] is oil indicator
-  # Note we do it in log scale
-
-PRIOR, The priors are assigned to the variables b[1] and b[2], b[3].
-  # We assume a non-informative prior, where we say tha the prior takes from a normal distribution with   # infinite variance, which makes it a flat distribution. Note: Unlike flat uniform distribution,
-  # the normal distribution is not bounded here. Because we are doing a linear regression it is not 
-  # advisable to bound the variable in a fixed interval
-  
-# Going back to out lessons: We know when the mean (mu) of y is known then the prior for the  
-  # parameter variance (prec) of y can be taken as a Inv-Gamma distribution. We already know 
-  # mu = b0 + b1x, lets take variance from Inv-Gamma.
-  
-  ## NOTE: Important: We saw that jaggs take input for 'sd' as 1/sd. So instead of doing Inv-Gamma, we
-  # can actually do a gamma prior and 'not' inverse it. The gamma distribution depends on two
-  # hyperparameter 'shape' and 'rate'. 
 ```{r}
 library(rjags)
 # Jaggs takes in the model as a input string
@@ -129,7 +113,7 @@ inits1 = function(){
 }
 ```
 
-Specify the model and simulate
+### Specify the model and simulate
 ```{r}
 
 # Specify the model for 3 different Markov chains
@@ -146,19 +130,19 @@ mod1_csim = do.call(rbind, mod1_sim)
 
 ```
 
-Convergence Diagnostic : 
+### Convergence Diagnostic : 
 
-1. Trace Plots: The trace plots looks fine, we can see that the Markov chain reaches a stationary point. The three color indicates the three Markov chains we have run.
-```{r}
+#### 1. Trace Plots: The trace plots looks fine, we can see that the Markov chain reaches a stationary point. The three color indicates the three Markov chains we have run.
+```{r, fig.width=14, fig.height=15}
 plot(mod1_sim)
 ```
 
-2. Gelmann and Rubin Diagnostic: The diagnoistic compares the variance in each chain to the variance between different markov chains. Any smaller value close to 1 indicate stationary state and convergence. 
+#### 2. Gelmann and Rubin Diagnostic: The diagnoistic compares the variance in each chain to the variance between different markov chains. Any smaller value close to 1 indicate stationary state and convergence. 
 ```{r}
 gelman.diag(mod1_sim)
 ```
 
-3. Autocorrelation: The autocorrelation measures the lag between the samplings for a markov chain. If the autocorrelation is high say until 100 lag, that means that if we sample every 100th value (1th, 100th, 200th, 300th ...) from the markov chain then using only these samples to estimate the parameter mean and variance would make sense.
+#### 3. Autocorrelation: The autocorrelation measures the lag between the samplings for a markov chain. If the autocorrelation is high say until 100 lag, that means that if we sample every 100th value (1th, 100th, 200th, 300th ...) from the markov chain then using only these samples to estimate the parameter mean and variance would make sense.
 
 A good model: A good model would have low autocorrelation in just few lags say 5 or 10. Again it depends from domain to domain.
 
@@ -172,7 +156,7 @@ library("coda")
 mod1_sim[1][:,2]
 ```
 
-4. Effective Size: 
+#### 4. Effective Size: 
 Since we had high autocorrelation for b[1] and b[2], it is good to check the effective size. Effective size stores the number of samples that were actually effective among all the samples.
 
 We had total 3 Markov chain and 5000 samples each, so a total of 15000. Out of all 15000 sample size, the effective sample size for b[1] is only 345 and that for b[2] is 351, which is quite low.
@@ -180,7 +164,7 @@ We had total 3 Markov chain and 5000 samples each, so a total of 15000. Out of a
 effectiveSize(mod1_sim)
 ```
 
-5. POSTERIOR SUMMARY: The posterior summary looks very similar to the vanilla linear regression summary
+#### 5. POSTERIOR SUMMARY: The posterior summary looks very similar to the vanilla linear regression summary
 
 LM model:
 b1: 7.145, b2: -0.511, sig (standard error): 0.6867
@@ -201,7 +185,7 @@ summary(lmod)
 ```
 
 
-6. Residual Summary:
+#### 6. Residual Summary:
 Understanding residual is a very important diagnostic becasue they can show any sign of violation in our assumption. In particular we are looking for below signs. 
   1. the model is not linear,
   2. the observation are not independent from each other,
@@ -261,9 +245,11 @@ head(rownames(dat)[order(resid1, decreasing=TRUE)])
 ```
 
 
-LETS GET RID OF THE OUTLIER: 
+## LETS GET RID OF THE OUTLIER: 
 THE Outlier's ARE NAMED Saudi and Libya, which could possibly mean.
-We saw that the outliers were atleast 3 standard deviation away from the mean. So it would be wise to use some distribution that would have fatter tail. WHy not draw y's from a t-distribution
+We saw that the outliers were atleast 3 standard deviation away from the mean. So it would be wise to use some distribution that would have fatter tail. WHy not draw y's from a t-distribution.
+
+Hmm, this disn't work as expected. But hey, even a t-distribution said that these points were outlier, this brings up the question. Are they really outliers, can we actually remove them.
 ```{r}
 library(rjags)
 # Jaggs takes in the model as a input string
@@ -350,7 +336,7 @@ mod2_sim = coda.samples(model=mod2, variable.names=params2, n.iter=5e3)
 mod2_csim = do.call(rbind, mod2_sim)
 ```
 
-```{r}
+```{r, fig.width=14, fig.height=15}
 plot(mod2_sim)
 ```
 ```{r}
@@ -374,5 +360,16 @@ resid2 = data1_jaggs$y - y_hat2
 ```
 ```{r}
 plot(y_hat2, resid2)
+```
+
+# MODEL EVALUATION:
+
+Now, we have 3 models, [linear model with two parameter, Bayesian model with 2 parameter and the bayesian model with t-dist]. How do we know which model is good.
+
+### DIC: Deviance information criterion: It calculates the posterior mean of the loglikelihood of the model and adds a penalty to the model omplexity
+```{r}
+dic.sampled(lmod)
+dic.samples(mod1,n.iter=1e3)
+dic.samples(mod1,n.iter=1e3)
 ```
 

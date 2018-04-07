@@ -1,0 +1,175 @@
+---
+title: "Bayesian - Logistic Regression"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library("boot")
+data("urine")
+head(urine)
+```
+
+### Remove missing values
+```{r}
+dat = na.omit(urine)
+```
+
+## Exploratory Data Analysis
+1. Much of variable are linear fit to each other or strongly coorelated
+2. So it is a good idea to remove multicolinearity: Multicolinearity between explanatory variable can cause trouble in linear 
+   regression since two correlated variables will compete with each other to explain the response and hence this would cause
+   problem while hypothesis
+```{r, fig.width=14, fig.height=15}
+pairs(dat)
+```
+
+----> Correlation plot
+```{r, fig.width=7, fig.height=7}
+library(corrplot)
+M = cor(dat)
+corrplot(M)
+```
+
+## Multicolinearity: Can be removed by variable selection, AIC, BIC, DIC or Lasso feature selection
+
+#### Scale : We only scale the continuous explanatory variables, response variable is the first column, so we 
+```{r}
+X = scale(dat[,-1], center=TRUE, scale=TRUE)
+head(X)
+Y = dat[1]
+head(Y)
+```
+
+#### Deciding a prior: As dscussed above, we want variable selection that would favor coefficients that are near 0. Double exponential a.k.a Laplace Prior (ideation to Lasso) would be a favorable prior in this case, because of its shape. Laplace prior is a stricter version on normal and since our explanatory variables are all continuous laplace seems a good fit for variable selection.
+```{r}
+# Laplace prior Vs normal prior
+
+# The double exponential prior
+ddexp = function(x, mu, tau){
+  0.5*tau*exp(-tau*abs(x-mu))
+}
+
+# Laplace Prior Density: Fit a curve to a mu and tau linspace evaluating the prior. 
+curve(ddexp(x, mu=0.0, tau=1.0), from=-10.0, to=10.0, ylab="density", main='Double exponential distribution')
+
+# Normal Prior Density
+curve(dnorm(x, mean=0.0, sd=1.0), from=-10.0, to=10.0, lty=2, add=TRUE)
+legend("topright", legend=c('double_exponential/Laplace', "normal"), lty=c(1,2), bty="n")
+
+```
+
+## MODEL:
+Liklelihood : y|b0...bn ~ Bernouli(p)
+Prior: b0,b1...bn ~ DoubleExp(mu, sig2)
+```{r}
+library(rjags)
+mod1_string = "model{
+  for (i in 1:length(y)){
+    y[i] ~ dbern(p[i])
+    logit(p[i]) = b0 + b[1]*gravity[i] + b[2]*ph[i] + b[3]*osmo[i] + b[4]*cond[i] + b[5]*urea[i] + b[6]*calc[i]
+  }
+  
+  b0 ~ dnorm(0.0, 1/25)  # A non-informative prior for the intercept
+  for (j in 1:6){
+    b[j]  ~ ddexp(0.0, sqrt(2.0))   # standard deviation with inverse scale would give a variance of 1 in jags
+  }
+}"
+```
+
+## Set up Model Experiment:
+```{r}
+set.seed(92)
+
+data_jags = list(y=dat$r, gravity=X[,'gravity'], ph=X[,'ph'], osmo=X[,'osmo'], 
+                 cond=X[,'cond'], urea=X[,'urea'], calc=X[,"calc"])
+
+params = c('b0', "b")
+
+mod1 = jags.model(textConnection(mod1_string), data=data_jags, n.chains = 3)
+
+# Burn-in period
+update(mod1, 1e3)
+
+mod1_sim = coda.samples(model=mod1, variable.names = params, n.iter = 5e3)
+```
+
+## Model Diagnostic
+```{r, fig.width=14, fig.height=15}
+plot(mod1_sim)
+```
+
+-----> Gelman
+```{r}
+gelman.diag(mod1_sim)
+```
+
+
+----> Autocorrelation : Look okay after 10 lags
+```{r}
+autocorr.diag(mod1_sim)
+autocorr.plot(mod1_sim)
+```
+
+----> Effective Smaple Size: Low on b[3] and b[5]
+```{r}
+effectiveSize(mod1_sim)
+```
+
+-----> Calulate DIC:
+```{r}
+dic1 = dic.samples(mod1, n.iter=1e3)
+summary(dic1)
+```
+
+------> Posterior Density:
+It is a good idea to plot the posterior density of b's. This would give a sense of if the model is doing good and b's generated are different.
+
+1. One catch: We can see that the column "osmo" or osmolarity has a distribution very similar to the double exponential distribution and is almost centered at 0. Hence it is safe to assume that the column "osmo" doesnt account much to the model, and we may remove it. 
+2. THe same goes for ph.
+3. The plots of urea and gravity looks alike and flipped. we also saw that urea and gravity were very coorelated using the plots and coorelation values, hence it would be safe to remove the column
+```{r}
+par(mfrow=c(3,2))
+densplot(mod1_sim[,1:6], xlim=c(-5.0,5.0))
+colnames(X)
+```
+
+
+## MODEL 2: Removing Urea, Osmo and ph:
+REMEMBER: Now that we have performed double exponential distribution and removed the ph and osmo features, we no longer need to
+do variable selection, so we can use a different prior for the b's this time. For simplicity we take a non-informative prior.
+```{r}
+library(rjags)
+mod2_string = "model{
+  for (i in 1:length(y)){
+    y[i] ~ dbern(p[i])
+    logit(p[i]) = b0 + b[1]*gravity[i] + b[2]*cond[i] + b[3]*calc[i]
+  }
+  
+  b0 ~ dnorm(0.0, 1/25.0)  # Again somwhat wide normal dist
+  for (j in 1:3){
+    b[j] ~ dnorm(0.0, 1/25.0)  # Non-informative prior for logistic regression
+  }
+}"
+```
+
+#### SET UP model:
+```{r}
+set.seed(92)
+
+data2_jags = list(y=dat$r, gravity=X[,'gravity'], cond=X[,'cond'], calc=X[,"calc"])
+
+params = c('b0', "b")
+
+mod2 = jags.model(textConnection(mod2_string), data=data2_jags, n.chains = 3)
+
+update(mod2, 1e3)
+
+mod2_sim = coda.samples(model=mod2, variable.names = params, n.iter = 5e3)
+
+mod2_csim = as.mcmc(do.call(rbind, mod2_sim))
+```
+
+```{r}
+plot(mod2_)
+```
+
