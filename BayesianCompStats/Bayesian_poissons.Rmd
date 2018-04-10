@@ -1,0 +1,160 @@
+---
+title: "Bayesian_poissons"
+output: pdf_document
+---
+
+
+```{r}
+library("COUNT")
+
+data("badhealth")
+head(badhealth)
+```
+
+```{r}
+# Check for missing value and distribution statistics
+any(is.na(badhealth))
+```
+
+# Plot th ehistogram of th response variable: See, sheavoly right skewed
+```{r}
+hist(badhealth$numvisit, breaks=20)
+```
+
+Plot numvisit against the explanatory variables, add jitters:
+Since we are modeling poissons distribution, we would like to use the log scale. Some counts are 0 in the response variable, that would not produce correct log values. 
+
+1. It seems to some extent that when age increases than the number of visits increases. 
+2. The red points (bad_heath) are more on the top region, which makes sense because if people have ba health, they tend to visit to hospital more often.
+```{r}
+# plot numvisits against age where badh is 0 and numvisits>0
+plot(jitter(log(numvisit)) ~ jitter(age), data=badhealth, subset=badh==0&numvisit>0, xlab="age", ylab="log(numvisits)")
+# plot numvisits against age where badh is 0 and numvisits>0
+points(jitter(log(numvisit)) ~ jitter(age), data=badhealth, subset=badh==1&numvisit>0, xlab="age", ylab="log(numvisits)", col="red")
+```
+
+
+### Modeling: He have the following.
+Here we would also like to add a interaction variable between badh and age.
+1. likelihood : y|x,b0,b1,b2 ~ Poissons(lambda)
+2. Prior: b0 ~ N(0,inf)
+          b_badh ~ N(0, inf)
+          b_age ~ N(0, inf)
+          b_interaction ~ N(0, inf)
+
+Benefit: Teh benifit of poissons model in that unlike the log lnear model where we take a log over the response y. In the poissons distribution we take the log over the link function i.e the parameters lamda.  
+```{r}
+mod1_string = "model{
+  for (i in 1:length(numvisit)){
+    numvisit[i] ~ dpois(lam[i])
+    log(lam[i]) = b0 + b_badh*badh[i] + b_age*age[i] + b_interaction*age[i]*badh[i]
+  }
+  
+  b0 ~ dnorm(0.0, 1/1e6)
+  b_badh ~ dnorm(0.0, 1/1e4)
+  b_age ~ dnorm(0.0, 1/1e4)
+  b_interaction ~ dnorm(0.0, 1/1e4)
+}"
+```
+
+### Set up experiment
+```{r}
+library("rjags")
+
+set.seed(102)
+data_jags = as.list(badhealth)
+str(data_jags)
+
+params = c('b0', 'b_badh', 'b_age', 'b_interaction')
+
+## Initialize the model
+mod = jags.model(textConnection(mod1_string), data=data_jags, n.chains=3)
+
+## Run the model for 1000 burning period
+update(mod, 1e3)
+
+## Run and save for another 5000 simulations
+mod_sim = coda.samples(model=mod, variable.names = params, n.iter=5e3)
+
+## Combine the simulation results of parameters
+mod_csim = as.mcmc(do.call(rbind, mod_sim))
+```
+
+Diagnoitics:
+```{r, fig.width=14, fig.height=15}
+plot(mod_sim)
+```
+
+
+```{r}
+gelman.diag(mod1_sim)
+```
+
+```{r}
+autocorr.diag(mod_sim)
+autocorr.plot(mod_sim)
+```
+
+
+```{r}
+dic1 = dic.samples(mod, n.iter=1e3)
+
+dic1
+effectiveSize(mod_sim)
+```
+
+### Residual analysis
+```{r}
+X = as.matrix(badhealth[,-1])
+head(X)
+X = cbind(X, with(badhealth, badh*age))
+head(X)
+
+# Check out the posterior median for each parameters. We could even take the means
+pmed_coef = apply(mod_csim, 2, median) # Here 2 indicates perform column wise operation
+pmed_coef
+
+# We have the params and we have the X, let compute the linear model
+log_lambda = pmed_coef['b0'] + X %*% pmed_coef[c("b_badh", "b_age", "b_interaction")]
+head(log_lambda)
+
+# Since we took logarithm of lamda which is the parameter for Y, Here we take the exponential of the logarithmic scale to 
+# get back our actual predicted y_hat
+lamda_hat = exp(log_lambda)
+head(lamda_hat)
+
+# Residuals
+resid = badhealth$numvisit - lamda_hat
+set.seed(001)
+plot(sample(resid)) # We shuffle beacuse the y's were sorted by num_visits. If not shuffled the plot would look confusing
+
+
+```
+
+
+
+
+Plotting Residual Vs lambda_hat:
+1. It can be seen that the mean of doctor visits when the health is not bad is 2
+    and the mean of doctor visits when the health is bad is 6. This makes sense
+2. 
+```{r, fig.width=8, fig.height=10}
+plot(lamda_hat[which(badhealth$badh==0)], resid[which(badhealth$badh==0)], xlim=c(0,8), ylim = range(resid))
+points(lamda_hat[which(badhealth$badh==1)], resid[which(badhealth$badh==1)], col='red')
+```
+
+
+In the poissons model, the parameter lamda is the mean and variance. Teh above plot make sense that the variability increases as we move from no bad health to bad health. But lets check the variance of the teh residuals. It seems that the variability of the residuals is too high than expected. This indicated the model might have fit poorly which means that the covariated (badh, age, interaction) do not explain very well the variability in the data or the data are overdisperesed for the poissons likelihood. Inthe later case it is often good to try other models such as negative binomial distribution.
+```{r}
+var(resid[which(badhealth$badh==0)])
+
+var(resid[which(badhealth$badh==1)])
+```
+
+
+
+
+
+
+
+
