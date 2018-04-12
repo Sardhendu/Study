@@ -151,10 +151,85 @@ var(resid[which(badhealth$badh==0)])
 var(resid[which(badhealth$badh==1)])
 ```
 
+### Interpretig Summary Results:
+WE saw that the model fit was not adequate. But let assume it was and lets interpret the outputs.
+
+If the parameters are positive, then there is a positive assosiation between that parameter and doctor visits
+
+1. b0 is not interpretable because in the data set we have 20 years as minimum healthy individual and here b0 has value closer to 0.
+2. b_age: Age shows a positive weight for number of doctor visits and it makes sense becasue even if you are older, you are still probable to visit doctors.
+3. b_badh: A positive effect, if bad health than more probale to visit a doctor
+3. b_interaction: The output has modeled number of visits. The interaction coefficient is negative, the b_interaction is interpreted as an adjustment for people with less age but bad health. This makes sense because even your age is not very high and you have bad health, you would still visit a doctor.
+
+```{r}
+summary(mod_sim)
+```
+
+# Why Bayesian Analysis is Awesome:
+Lets say we have two people, one is in good health and the other is in bad health. We would be intereseted in a (Posterior Probability) that the indevidual would have more doctor visits. Scenario's like these are where posterior hypothesis sines.
+
+These interpretations are difficult with frequentist approach, A frequentist apprach would simply say the number of visits on average given the patient condition. In bayesian we can get a estimated range.
+
+Say we have the below individuals
+    age  badh interaction
+x1:  35    0      0
+x2:  35    1      1
 
 
+Idea: The idea to calculate the probability is:
+Step 1. Compute the posterior distribution using MCMC samples and likelihood linear model. Compute the loglamda given sampled MCMC parameters (b0, b_age, b_badh, b_interaction) which is simply the linear combination. i.e [b1 + b1x1+ ...]
+Step 2: Calculate the exponent of log lambda to bring them the prediction scale
+Step 3: For each person, Sample "number of visits" from the poissons distribution, where the mean is lamda drawn from the posterior distribution and exponentiated.
+
+THIS IS BASICALLY THE POSTERIOR PREDICTIVE RESPONSE
 
 
+```{r}
+x1 = c(35, 0, 0)
+x2 = c(35, 1, 35)
 
+# The posteriar distribution for the parameters looks like
+head(mod_csim)
+
+# Compute the posterior density for the two individual
+# Compute the linear term i.e b0 + b1x1 + b2x2 .....
+loglam1 = mod_csim[, "b0"] + mod_csim[, c(2,3,4)] %*% x1 
+loglam2 = mod_csim[, "b0"] + mod_csim[, c(2,3,4)] %*% x2
+
+# We have the samples form the posterior distributino of log on lambda of poissons model. We now, calculate the exponent to bring them to the right scale.
+lam1 = exp(loglam1)
+lam2 = exp(loglam2)
+
+# For the above step we have montecarlo means for the two individual, We now vizuallize them
+plot(density(lam1))
+plot(density(lam2))
+
+# From the inference:
+# From the plots below, we can say that for person1 (with good health) we can assume their doctor visits to range from 1.8 to 2.1, whereas for person 2 its between 5.5 to 7. This makes sense
+
+# Now even furter we determin the posterior probability of person 1 having more doctor visits.
+# Here we simulate "lamdas"" from the posterior distribution of lambdas of both the person.
+y1 = rpois(length(lam1), lam1)
+y2 = rpois(length(lam2), lam2)
+```
+
+
+```{r}
+head(y1)
+head(y2)
+
+# We compute probabilities and plot the number of doctor visits against its probility. As you can see the plots make complete sense. 
+#### NOTE the levels below shows the number of doctor visits.
+plot(table(factor(y1, levels=0:20))/length(y1), xlab = 'Number of doctor visits (good health)', ylab = 'Probability of doctor visits (good health)')
+points(table((y2+0.1))/length(y2), xlab = 'Number of doctor visits (bad health)', ylab = 'Probability of doctor visits (bad health)', col='red')
+
+# Finally answer to outquestion:
+# What is the probability of doctor visits of person 1 will be more than person 2
+mean(y2>y1)  # 91.6 % which makes complete sense
+
+```
+
+## Final theory:
+Beacasue we used the posterior samples for our model parameters in the simulations. This posterior predictive distribution on the "number of doctor visits." for each person naturally takes in account of the uncertainity of our model estimates. This creates a much honest and reliable output that we would get we had fixd the model parameter if we had fixed our b's or model parameters to a fixed number.
 
 

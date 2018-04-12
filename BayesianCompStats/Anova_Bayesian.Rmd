@@ -187,3 +187,7 @@ It seems that catagory 1 have more variability within compared to category 2 and
 plot(yhat, resid)
 ```
 
+```{r}
+var(c(4,5,6))
+```
+
