@@ -6,12 +6,14 @@ output: pdf_document
 ```{r setup, include=FALSE}
 library("boot")
 data("urine")
+length(urine)
 head(urine)
 ```
 
 ### Remove missing values
 ```{r}
 dat = na.omit(urine)
+dim(dat)
 ```
 
 ## Exploratory Data Analysis

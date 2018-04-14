@@ -1,0 +1,82 @@
+---
+title: "mixture"
+author: "Sardhendu Mishra"
+date: "4/12/2018"
+output: pdf_document
+---
+
+```{r}
+data_path = '/Users/sam/All-Program/App/Study/BayesianCompStats/mixture.csv'
+data = read.csv(data_path, header=FALSE)
+head(data)
+```
+
+
+# Intuition:
+As we can see from the plot that the graph is bimodel, which means there are two categories or mixture of gaussian.
+It is important which y belongs to which y.
+```{r}
+y = data$V1
+plot(density(y))
+```
+
+# Building mixture mode with JAGS Bayesian Style:
+
+We assume that there are two categories each governed by "omega" (since we see there are two mixtures). We define a latent variable that z whose i draws are from either category.
+Imagine a neural network, with layer 1 (y units) as input and a latent layer (y units) and a softmax layer with 2 units
+```{r}
+library("rjags")
+
+model_string = "model{
+  for (i in 1:length(y)){
+    y[i] ~ dnorm(mu[z[i]], prec)
+    z[i] ~ dcat(omega)               # Since omega takes on two category we draw z's from categorical distribution
+  }
+  
+  # Intuitively We saw that one mixture goes from -6 to 4 and the other goes from -4 to 6.
+  # We eexplicitely provide proper means such that the MCMC sample to quickly able to find the two mixture and distuingish them.
+  mu[1] ~ dnorm(-1.0, 1.0/100)
+  mu[2] ~ dnorm(1.0, 100.0) T(mu[1],)
+  
+  # We provide the usual prior to the prec parameter which is again the variance
+  prior_sample_size_1 = 1 
+  prior_guess_for_variance_1 = 1
+  prec ~ dgamma(prior_sample_size_1/2, prior_sample_size_1*prior_guess_for_variance_1/2)
+  sig = sqrt(1.0/prec)
+  
+  # Now the important part comes in.
+  # Since omega is modeled categorically, we should provide it a prior distribution that follows the categorical norms. 
+  # Beta or Dirichlet sound good for such cases. Lets use dirichlet
+  omega ~ ddirich(c(1.0,1.0))
+}"
+```
+
+## Experiment Setup
+```{r}
+set.seed(11)
+
+data_jags = list(y=y)
+
+# We randomly choose few z's to monitor, such that the model is working fine
+params = c("mu", "sig", "omega", "z[1]", "z[31]", "z[49]", "z[6]")
+
+mod = jags.model(textConnection(model_string), data=data_jags, n.chains = 3)
+
+# Burn-in period
+update(mod, 1e3)
+
+mod_sim = coda.samples(model = mod, variable.names = params, n.iter=5e3)
+mod_csim = as.mcmc(do.call(rbind, mod_sim))
+```
+
+```{r, fig.width=14, fig.height=15}
+plot(mod_sim)
+```
+
+# Analysis:
+* the mu[1],mu[2] looks good for the distibution
+* The posterior probability z[1], z[31], z[49], z[6] looks pretty fine
+```{r}
+summary(mod_sim)
+```
+
