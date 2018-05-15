@@ -1,18 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e3c99960-01a8-47bb-ae25-1109a42f8cc9" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/CTCI/chapter1/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/CTCI/chapter1/matrix_rotate.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/leetcode/multiply_without_self.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/leetcode/shortest_palindrome.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/CTCI/chapter1.py" afterPath="$PROJECT_DIR$/CTCI/chapter1/chapter1.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.ipynb_checkpoints/Untitled1-checkpoint.ipynb" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/Untitled1-checkpoint.ipynb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CTCI/Chapter4/minimal_binary_tree.py" afterPath="$PROJECT_DIR$/CTCI/Chapter4/minimal_binary_tree.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Untitled1.ipynb" afterPath="$PROJECT_DIR$/Untitled1.ipynb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/leetcode/max_length_subarray.py" afterPath="$PROJECT_DIR$/leetcode/max_length_subarray.py" />
-    </list>
+    <list default="true" id="e3c99960-01a8-47bb-ae25-1109a42f8cc9" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -38,7 +27,7 @@
       <file leaf-file-name="graphNode.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/CTCI/Chapter4/graphNode.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="625">
+            <state relative-caret-position="605">
               <caret line="39" column="19" lean-forward="false" selection-start-line="39" selection-start-column="8" selection-end-line="39" selection-end-column="19" />
               <folding />
             </state>
@@ -58,8 +47,8 @@
       <file leaf-file-name="minimal_binary_tree.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/CTCI/Chapter4/minimal_binary_tree.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="552">
-              <caret line="102" column="13" lean-forward="true" selection-start-line="102" selection-start-column="13" selection-end-line="102" selection-end-column="13" />
+            <state relative-caret-position="572">
+              <caret line="103" column="26" lean-forward="false" selection-start-line="103" selection-start-column="26" selection-end-line="103" selection-end-column="26" />
               <folding />
             </state>
           </provider>
@@ -88,8 +77,8 @@
       <file leaf-file-name="shortest_palindrome.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/leetcode/shortest_palindrome.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="340">
-              <caret line="16" column="21" lean-forward="true" selection-start-line="16" selection-start-column="21" selection-end-line="16" selection-end-column="21" />
+            <state relative-caret-position="320">
+              <caret line="16" column="21" lean-forward="false" selection-start-line="16" selection-start-column="21" selection-end-line="16" selection-end-column="21" />
               <folding />
             </state>
           </provider>
@@ -98,8 +87,8 @@
       <file leaf-file-name="rectangle_area.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/leetcode/rectangle_area.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
-              <caret line="11" column="12" lean-forward="true" selection-start-line="11" selection-start-column="12" selection-end-line="11" selection-end-column="12" />
+            <state relative-caret-position="220">
+              <caret line="11" column="12" lean-forward="false" selection-start-line="11" selection-start-column="12" selection-end-line="11" selection-end-column="12" />
               <folding />
             </state>
           </provider>
@@ -119,7 +108,7 @@
         <entry file="file://$PROJECT_DIR$/leetcode/preoductExceotSelf.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="300">
-              <caret line="15" column="4" lean-forward="true" selection-start-line="15" selection-start-column="4" selection-end-line="15" selection-end-column="4" />
+              <caret line="15" column="4" lean-forward="false" selection-start-line="15" selection-start-column="4" selection-end-line="15" selection-end-column="4" />
               <folding />
             </state>
           </provider>
@@ -217,8 +206,8 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" fullScreen="true">
-    <option name="width" value="1440" />
-    <option name="height" value="900" />
+    <option name="width" value="2560" />
+    <option name="height" value="1080" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -487,7 +476,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.18625894" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.29256082" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.29256082" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32962668" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -837,16 +826,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/leetcode/shortest_palindrome.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="16" column="21" lean-forward="true" selection-start-line="16" selection-start-column="21" selection-end-line="16" selection-end-column="21" />
+        <state relative-caret-position="320">
+          <caret line="16" column="21" lean-forward="false" selection-start-line="16" selection-start-column="21" selection-end-line="16" selection-end-column="21" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/leetcode/rectangle_area.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="11" column="12" lean-forward="true" selection-start-line="11" selection-start-column="12" selection-end-line="11" selection-end-column="12" />
+        <state relative-caret-position="220">
+          <caret line="11" column="12" lean-forward="false" selection-start-line="11" selection-start-column="12" selection-end-line="11" selection-end-column="12" />
           <folding />
         </state>
       </provider>
@@ -862,7 +851,7 @@
     <entry file="file://$PROJECT_DIR$/leetcode/preoductExceotSelf.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="300">
-          <caret line="15" column="4" lean-forward="true" selection-start-line="15" selection-start-column="4" selection-end-line="15" selection-end-column="4" />
+          <caret line="15" column="4" lean-forward="false" selection-start-line="15" selection-start-column="4" selection-end-line="15" selection-end-column="4" />
           <folding />
         </state>
       </provider>
@@ -877,7 +866,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/CTCI/Chapter4/graphNode.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="625">
+        <state relative-caret-position="605">
           <caret line="39" column="19" lean-forward="false" selection-start-line="39" selection-start-column="8" selection-end-line="39" selection-end-column="19" />
           <folding />
         </state>
@@ -901,8 +890,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/CTCI/Chapter4/minimal_binary_tree.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="552">
-          <caret line="102" column="13" lean-forward="true" selection-start-line="102" selection-start-column="13" selection-end-line="102" selection-end-column="13" />
+        <state relative-caret-position="572">
+          <caret line="103" column="26" lean-forward="false" selection-start-line="103" selection-start-column="26" selection-end-line="103" selection-end-column="26" />
           <folding />
         </state>
       </provider>
